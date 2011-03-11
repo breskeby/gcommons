@@ -10,6 +10,7 @@ class AlgorithmsBean extends BaseBean
     int[] sort ( int[] data, SortOption option = SortOption.Quick, boolean validate = true )
     {
         int[] sortedData = ( option == SortOption.Select ) ? sortSelect( data ) :
+                           ( option == SortOption.Insert ) ? sortInsert( data ) :
                                                              null
         if ( validate )
         {
@@ -25,7 +26,7 @@ class AlgorithmsBean extends BaseBean
 
 
     /**
-     * "Selection sort" of data specified, modifies the array specified.
+     * "Selection sort" of data specified, modifies the original array.
      * http://en.wikipedia.org/wiki/Selection_sort
      * 
      * @param data input array to sort
@@ -34,7 +35,7 @@ class AlgorithmsBean extends BaseBean
     private int[] sortSelect ( int[] data )
     {
         /**
-         * Finds index of the minimal element in the range starting at index specified
+         * Finds index of the minimal element in the range starting at "startIndex".
          */
         Closure<Integer> findMinIndex = {
             int startIndex ->
@@ -50,10 +51,61 @@ class AlgorithmsBean extends BaseBean
 
         for ( j in ( 0 ..< data.length ))
         {
-            int minIndex     = findMinIndex( j )
-            int temp         = data[ j ]
-            data[ j ]        = data[ minIndex ]
-            data[ minIndex ] = temp
+            int minIndex = findMinIndex( j )
+            
+            if ( minIndex != j )
+            {
+                int temp         = data[ j ]
+                data[ j ]        = data[ minIndex ]
+                data[ minIndex ] = temp
+            }
+        }
+
+        data
+    }
+
+
+    /**
+     * "Insert sort" of data specified, modifies the original array.
+     * http://en.wikipedia.org/wiki/Insert_sort
+     *
+     * @param data input array to sort
+     * @return same array object with its elements sorted in increasing order
+     */
+    private int[] sortInsert ( int[] data )
+    {
+        /**
+         * Finds index to insert the element specified in the range ending at "end" index.
+         */
+        def findInsertIndex = {
+            int elem, int end ->
+            for ( j in (( end - 1 ) .. 0 )) { if ( data[ j ] <= elem ){ return ( j + 1 ) }}
+            0
+        }
+
+        /**
+         * Move elements right in the range starting at "start" and ending at "end" indexes.
+         */
+        def moveRight = {
+            int start, int end ->
+
+            assert ( end > start ), "moverRight( $data, $start, $end ): [$end] <= [$start]"
+            for ( int j in (( end - 1 ) .. start )) { data[ j + 1 ] = data[ j ]}
+        }
+
+        if ( data )
+        {
+            for ( j in ( 1 ..< data.length ))
+            {
+                int elem        = data[ j ]
+                int insertIndex = findInsertIndex( elem, j )
+
+                if ( insertIndex < j )
+                {   // If there's a need to move, elem can be at the right place already
+                    moveRight( insertIndex, j )
+                    data[ insertIndex ] = elem
+                }
+            }
         }
 
         data
