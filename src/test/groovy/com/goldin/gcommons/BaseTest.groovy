@@ -20,6 +20,7 @@ class BaseTest
     final FileBean       fileBean      = GCommons.file()
     final NetBean        netBean       = GCommons.net()
     final GroovyBean     groovyBean    = GCommons.groovy()
+    final AlgorithmsBean algBean       = GCommons.alg()
 
     
     /**

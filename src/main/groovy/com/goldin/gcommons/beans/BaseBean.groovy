@@ -16,7 +16,7 @@ class BaseBean
 
 
     /**
-     * Injected by Spring
+     * Injected by Spring, see "gcommons-application-context.xml"
      */
     ConstantsBean constants
     VerifyBean    verify

@@ -192,11 +192,6 @@
         <inspection_tool class="GroovyConditionalCanBeConditionalCall" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalCanBeElvis" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyConditionalWithIdenticalBranches" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyConstantNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_regex" value="[A-Z\d]*" />
-          <option name="m_minLength" value="4" />
-          <option name="m_maxLength" value="32" />
-        </inspection_tool>
         <inspection_tool class="GroovyContinue" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyContinueOrBreakFromFinallyBlock" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyDoubleCheckedLocking" enabled="true" level="WARNING" enabled_by_default="true">
@@ -357,8 +352,6 @@
           <option name="m_maxLength" value="20" />
         </inspection_tool>
         <inspection_tool class="PrintStackTrace" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="Println" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="PropertyName" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="RemoveAllOnSelf" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="RequiredRegex" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ReturnNullFromCatchBlock" enabled="true" level="WARNING" enabled_by_default="true" />

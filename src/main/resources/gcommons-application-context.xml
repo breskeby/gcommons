@@ -60,4 +60,11 @@
           p:verify-ref            = "verify"
           p:general-ref           = "general"
           p:file-ref              = "file"/>
+
+    <bean name                    = "algorithms"
+          class                   = "com.goldin.gcommons.beans.AlgorithmsBean"
+          p:constants-ref         = "constants"
+          p:verify-ref            = "verify"
+          p:general-ref           = "general"
+          p:file-ref              = "file"/>
 </beans>

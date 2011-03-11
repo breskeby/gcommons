@@ -69,11 +69,12 @@ class GCommons
 
 
     static ConfigurableApplicationContext context   ( boolean refresh = false ) { CONTEXT = ( refresh ? newContext() : CONTEXT ) }
-    static ConstantsBean                  constants ( boolean refresh = false ) { getBean( ConstantsBean, refresh ) }
-    static VerifyBean                     verify    ( boolean refresh = false ) { getBean( VerifyBean,    refresh ) }
-    static GeneralBean                    general   ( boolean refresh = false ) { getBean( GeneralBean,   refresh ) }
-    static FileBean                       file      ( boolean refresh = false ) { getBean( FileBean,      refresh ) }
-    static IOBean                         io        ( boolean refresh = false ) { getBean( IOBean,        refresh ) }
-    static NetBean                        net       ( boolean refresh = false ) { getBean( NetBean,       refresh ) }
-    static GroovyBean                     groovy    ( boolean refresh = false ) { getBean( GroovyBean,    refresh ) }
+    static ConstantsBean                  constants ( boolean refresh = false ) { getBean( ConstantsBean,  refresh ) }
+    static VerifyBean                     verify    ( boolean refresh = false ) { getBean( VerifyBean,     refresh ) }
+    static GeneralBean                    general   ( boolean refresh = false ) { getBean( GeneralBean,    refresh ) }
+    static FileBean                       file      ( boolean refresh = false ) { getBean( FileBean,       refresh ) }
+    static IOBean                         io        ( boolean refresh = false ) { getBean( IOBean,         refresh ) }
+    static NetBean                        net       ( boolean refresh = false ) { getBean( NetBean,        refresh ) }
+    static GroovyBean                     groovy    ( boolean refresh = false ) { getBean( GroovyBean,     refresh ) }
+    static AlgorithmsBean                 alg       ( boolean refresh = false ) { getBean( AlgorithmsBean, refresh ) }
 }
