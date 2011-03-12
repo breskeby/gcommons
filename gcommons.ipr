@@ -217,11 +217,6 @@
           <option name="m_minLength" value="4" />
           <option name="m_maxLength" value="32" />
         </inspection_tool>
-        <inspection_tool class="GroovyInstanceVariableNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="m_regex" value="m_[a-z][A-Za-z\d]*" />
-          <option name="m_minLength" value="1" />
-          <option name="m_maxLength" value="32" />
-        </inspection_tool>
         <inspection_tool class="GroovyInterfaceNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
           <option name="m_regex" value="[A-Z][A-Za-z\d]*" />
           <option name="m_minLength" value="8" />
@@ -235,7 +230,6 @@
         <inspection_tool class="GroovyNegatedConditional" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyNegatedIf" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyNestedAssignment" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="GroovyNestedConditional" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyNestedSwitch" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyNestedSynchronizedStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="GroovyNonShortCircuitBoolean" enabled="true" level="WARNING" enabled_by_default="true" />
