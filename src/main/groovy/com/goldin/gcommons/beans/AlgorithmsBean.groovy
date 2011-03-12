@@ -12,14 +12,13 @@ class AlgorithmsBean extends BaseBean
         int[] sortedData = ( option == SortOption.Selection ) ? selectionSort( data ) :
                            ( option == SortOption.Insertion ) ? insertionSort( data ) :
                            ( option == SortOption.Merge     ) ? mergeSort    ( data ) :
+                           ( option == SortOption.Quick     ) ? quickSort    ( data ) :
                                                                 null
-        if ( validate )
+        assert ( sortedData != null ), "Unknown sorting option [$option], should be one of [${ SortOption.values() }]"
+
+        if ( validate && data.length )
         {
-            for ( j in ( 0 ..< data.length ))
-            {
-                if ( j > 0 )                 { assert sortedData[ j - 1 ] <= sortedData[ j ] }
-                if ( j < ( data.length - 1 )){ assert sortedData[ j + 1 ] >= sortedData[ j ] }
-            }
+            for ( j in ( 1 ..< data.length )) { assert sortedData[ j ] >= sortedData[ j - 1 ] }
         }
 
         sortedData
@@ -169,6 +168,20 @@ class AlgorithmsBean extends BaseBean
     }
 
 
+    /**
+     * "Quick sort" of data specified, modifies the original array.
+     * http://en.wikipedia.org/wiki/Quicksort
+     *
+     * @param data input array to sort
+     * @return same array object with its elements sorted in increasing order
+     */
+    private int[] quickSort( int[] data )
+    {
+        data
+    }
+
+
+
     int binarySearch ( int element, int[] data, boolean recursion = true )
     {
 
@@ -192,13 +205,13 @@ public enum SortOption
     */
    Insertion,
 
+    /**
+     * http://en.wikipedia.org/wiki/Merge_sort
+     */
+     Merge,
+
    /**
     * http://en.wikipedia.org/wiki/Quicksort
     */
     Quick,
-
-   /**
-    * http://en.wikipedia.org/wiki/Merge_sort
-    */
-    Merge,
 }
