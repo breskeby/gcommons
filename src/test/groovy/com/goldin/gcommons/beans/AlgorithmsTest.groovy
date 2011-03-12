@@ -43,7 +43,7 @@ class AlgorithmsTest extends BaseTest
     static List<int[]> randomArrays( boolean randomSize = true )
     {
         def random = new Random( new Random( System.currentTimeMillis()).nextLong())
-        def size   = System.getProperty( 'slowTests' ) ?  99999 : 999
+        def size   = System.getProperty( 'slowTests' ) ?  9999 : 999
         def list   = []
 
         3.times {
