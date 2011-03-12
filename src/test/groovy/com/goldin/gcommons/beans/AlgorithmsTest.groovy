@@ -19,7 +19,10 @@ class AlgorithmsTest extends BaseTest
         [[5, 4, 3, 2, 1], [1, 2, 3, 4, 5]],
         [[5, 6, 8, 2, 1], [1, 2, 5, 6, 8]],
         [[5, 5, 5, 5, 5], [5, 5, 5, 5, 5]],
-        [[5, 6, 8, 2, 1, -1, -3, -12345, 0, 0], [-12345, -3, -1, 0, 0, 1, 2, 5, 6, 8]],
+        [[5, 6, 8, 2, 1, -1, -3, -12345, 0, 0],
+         [-12345, -3, -1, 0, 0, 1, 2, 5, 6, 8]],
+        [[1, 3, 6, 43, 12, 78, 123, -98, -23, 0, 0, 2, 4, 5, 78, 93 ],
+         [-98, -23, 0, 0, 1, 2, 3, 4, 5, 6, 12, 43, 78, 78, 93, 123]]
     ]
 
 
@@ -39,9 +42,13 @@ class AlgorithmsTest extends BaseTest
 
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
-    void selectSort () { applySort( SortOption.Selection ) }
+    void selectionSort () { applySort( SortOption.Selection ) }
 
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
-    void insertSort () { applySort( SortOption.Insertion ) }
+    void insertionSort () { applySort( SortOption.Insertion ) }
+
+    @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
+    @Test
+    void mergeSort () { applySort( SortOption.Merge ) }
 }
