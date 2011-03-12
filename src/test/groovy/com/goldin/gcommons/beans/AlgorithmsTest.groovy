@@ -49,10 +49,10 @@ class AlgorithmsTest extends BaseTest
             println "$input => $output, [${ System.currentTimeMillis() - t }] ms"
         }
 
-        print "Testing random arrays: "
-
         def random = new Random( new Random( System.currentTimeMillis()).nextLong())
         def array  = new int[ 8000 ]
+
+        print "Testing random arrays of size [$array.length]: "
 
         3.times {
             for ( j in ( 0 ..< array.length )){ array[ j ] = random.nextInt() }
