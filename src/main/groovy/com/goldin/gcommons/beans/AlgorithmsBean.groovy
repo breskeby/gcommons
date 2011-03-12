@@ -146,20 +146,22 @@ class AlgorithmsBean extends BaseBean
                 mergeSortHelper( middle, findMiddleIndex( middle, end ), end )
             }
 
-            def leftIndex  = start
-            def rightIndex = middle
-
-            for ( helperIndex in ( start ..< end ))
+            if (( middle > start ) && ( data[ middle ] < data [ middle - 1 ] ))
             {
-                def dataIndex = ( leftIndex  >= middle ) ?                   rightIndex++ :
-                                ( rightIndex >= end    ) ?                   leftIndex++  :
-                                ( data[ leftIndex ] < data[ rightIndex ] ) ? leftIndex++  :
-                                                                             rightIndex++
+                def leftIndex  = start
+                def rightIndex = middle
+                for ( helperIndex in ( start ..< end ))
+                {
+                    def dataIndex = ( leftIndex  >= middle ) ?                   rightIndex++ :
+                                    ( rightIndex >= end    ) ?                   leftIndex++  :
+                                    ( data[ leftIndex ] < data[ rightIndex ] ) ? leftIndex++  :
+                                                                                 rightIndex++
 
-                helper[ helperIndex ] = data[ dataIndex ]
+                    helper[ helperIndex ] = data[ dataIndex ]
+                }
+
+                System.arraycopy( helper, start, data, start, ( end - start ))
             }
-
-            System.arraycopy( helper, start, data, start, ( end - start ))
         }
 
         mergeSortHelper( 0, findMiddleIndex( 0, data.length ), data.length )
