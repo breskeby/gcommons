@@ -9,8 +9,8 @@ class AlgorithmsBean extends BaseBean
 
     int[] sort ( int[] data, SortOption option = SortOption.Quick, boolean validate = true )
     {
-        int[] sortedData = ( option == SortOption.Select ) ? sortSelect( data ) :
-                           ( option == SortOption.Insert ) ? sortInsert( data ) :
+        int[] sortedData = ( option == SortOption.Selection ) ? selectionSort( data ) :
+                           ( option == SortOption.Insertion ) ? insertionSort( data ) :
                                                              null
         if ( validate )
         {
@@ -32,7 +32,7 @@ class AlgorithmsBean extends BaseBean
      * @param data input array to sort
      * @return same array object with its elements sorted in increasing order
      */
-    private int[] sortSelect ( int[] data )
+    private int[] selectionSort ( int[] data )
     {
         /**
          * Finds index of the minimal element in the range starting at "startIndex".
@@ -72,7 +72,7 @@ class AlgorithmsBean extends BaseBean
      * @param data input array to sort
      * @return same array object with its elements sorted in increasing order
      */
-    private int[] sortInsert ( int[] data )
+    private int[] insertionSort ( int[] data )
     {
         /**
          * Finds index to insert the element specified in the range ending at "end" index.
@@ -128,12 +128,12 @@ public enum SortOption
    /**
     * http://en.wikipedia.org/wiki/Selection_sort
     */
-    Select,
+    Selection,
 
    /**
     * http://en.wikipedia.org/wiki/Insert_sort
     */
-    Insert,
+   Insertion,
 
    /**
     * http://en.wikipedia.org/wiki/Quicksort

@@ -39,9 +39,9 @@ class AlgorithmsTest extends BaseTest
 
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
-    void selectSort () { applySort( SortOption.Select ) }
+    void selectSort () { applySort( SortOption.Selection ) }
 
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
-    void insertSort () { applySort( SortOption.Insert ) }
+    void insertSort () { applySort( SortOption.Insertion ) }
 }
