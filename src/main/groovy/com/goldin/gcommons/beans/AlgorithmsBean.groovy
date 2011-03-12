@@ -7,7 +7,7 @@ package com.goldin.gcommons.beans
 class AlgorithmsBean extends BaseBean
 {
 
-    int[] sort ( int[] data, SortOption option = SortOption.Quick, boolean validate = true )
+    int[] sort ( int[] data, SortOption option = SortOption.Merge, boolean validate = true )
     {
         int[] sortedData = ( option == SortOption.Selection ) ? selectionSort( data ) :
                            ( option == SortOption.Insertion ) ? insertionSort( data ) :
@@ -128,7 +128,7 @@ class AlgorithmsBean extends BaseBean
                              int     middle          = -1,
                              int     end             = data.length,
                              int[]   helper          = new int[ data.length ],
-                             Closure findMiddleIndex = { int s, int e -> ( s + (( e - s ) >> 1 )) } )
+                             Closure findMiddleIndex = { int s, int e -> (( s + e ) >> 1 ) } )
     {
         if ( middle < 0 )
         {
@@ -217,11 +217,24 @@ class AlgorithmsBean extends BaseBean
     }
 
 
-
-    int binarySearch ( int element, int[] data, boolean recursion = true )
+    /**
+     * Makes a binary search on data sorted, looking for element provided.
+     * 
+     * @param data input data
+     * @param elem element to search for
+     * @param start search start index
+     * @param end   search end index, exclusive
+     * @return      element index or -1 if not found
+     */
+    int binarySearch ( int[] data, int elem, int start = 0, int end = data.length )
     {
+        if ( start == end ) { return -1 }
 
-        null
+        int middle = (( start + end ) >> 1 )
+        
+        (( elem == data[ middle ] ) ? middle :
+         ( elem <  data[ middle ] ) ? binarySearch( data, elem, start, middle   ) :
+                                      binarySearch( data, elem, middle + 1, end ))
     }
 }
 

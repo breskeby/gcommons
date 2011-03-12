@@ -9,7 +9,7 @@ import org.junit.Test
 class AlgorithmsTest extends BaseTest
 {
 
-    static final def arrays = [
+    static def TEST_ARRAYS = [
         [[],              []],
         [[1],             [1]],
         [[0],             [0]],
@@ -34,36 +34,54 @@ class AlgorithmsTest extends BaseTest
     ]
 
 
-    void applySort( SortOption option )
+    /**
+     * Retrieves a number of arrays with random content.
+     * @param randomSize whether arrays returned should be of random size as well
+     *
+     * @return number of arrays with random content
+     */
+    static List<int[]> randomArrays( boolean randomSize = true )
     {
-        println "Testing [$option] sorting method"
-
-        for ( array in arrays )
-        {
-            int[] input    = new ArrayList( array[ 0 ] ) as int[] // Making a copy for println() below
-            int[] expected = array[ 1 ] as int[]
-            long  t        = System.currentTimeMillis()
-            int[] output   = algBean.sort( array[ 0 ] as int[], option )
-
-            assert output == expected, "$output != $expected"
-            println "$input => $output, [${ System.currentTimeMillis() - t }] ms"
-        }
-
         def random = new Random( new Random( System.currentTimeMillis()).nextLong())
-        def array  = new int[ 8000 ]
-
-        print "Testing random arrays of size [$array.length]: "
+        def size   = System.getProperty( 'slowTests' ) ?  99999 : 999
+        def list   = []
 
         3.times {
+            def arraySize = ( randomSize ? random.nextInt( size ) + 11 : size )
+            def array     = new int[ arraySize ]
             for ( j in ( 0 ..< array.length )){ array[ j ] = random.nextInt() }
+            list << array
+        }
 
+        list
+    }
+
+    
+    void applySort( SortOption option )
+    {
+        println "Testing --== [$option] ==-- sorting method"
+
+        for ( arraysList in TEST_ARRAYS )
+        {
+            int[] input    = new ArrayList( arraysList[ 0 ] ) as int[] // Making a copy for println() below
+            int[] expected = arraysList[ 1 ] as int[]
+            int[] output   = algBean.sort( arraysList[ 0 ] as int[], option )
+
+            assert output == expected, "$output != $expected"
+            println "$input => $output"
+        }
+
+        def randomArrays = randomArrays( false )
+        print "Testing sort of random arrays of size [${ randomArrays.first().size()}]: "
+
+        for ( int[] randomArray in randomArrays )
+        {
             long t = System.currentTimeMillis()
-            algBean.sort( array, option )
+            algBean.sort( randomArray, option )
             print "[${ System.currentTimeMillis() - t }] ms, "
         }
 
         println "Ok"
-
     }
 
 
@@ -71,15 +89,63 @@ class AlgorithmsTest extends BaseTest
     @Test
     void selectionSort () { applySort( SortOption.Selection ) }
 
+    
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
     void insertionSort () { applySort( SortOption.Insertion ) }
+
 
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
     void mergeSort () { applySort( SortOption.Merge ) }
 
+
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
     void quickSort () { applySort( SortOption.Quick ) }
+
+
+    @Test
+    void binarySearch()
+    {
+        for ( arraysList in TEST_ARRAYS )
+        {
+            int[] inputArray  = arraysList[ 0 ] as int[]
+            int[] sortedArray = arraysList[ 1 ] as int[]
+
+            for ( int j in inputArray )
+            {
+                assert j == sortedArray[ algBean.binarySearch( sortedArray, j ) ]
+            }
+        }
+
+        def randomArrays = randomArrays()
+        print "Testing binary search in random arrays: "
+        
+        def checkArray = {
+            int[] array, int j ->
+
+            int index = algBean.binarySearch( array, j )
+            if ( index < 0 ) { assert ( ! array.any{ it == j } ) }
+            else             { assert j == array[ index ]        }
+        }
+
+        for ( int[] sortedArray in randomArrays.collect{ algBean.sort( it ) })
+        {
+            long t = System.currentTimeMillis()
+            
+            for ( int j in sortedArray )
+            {
+                assert j == sortedArray[ algBean.binarySearch( sortedArray, j ) ]
+                checkArray( sortedArray, j )
+                
+                if ( j < Integer.MAX_VALUE ) { checkArray( sortedArray, j + 1 ) }
+                if ( j > Integer.MIN_VALUE ) { checkArray( sortedArray, j - 1 ) }
+            }
+            
+            print "[$sortedArray.length] - [${ System.currentTimeMillis() - t }] ms, "
+        }
+
+        println "Ok"
+    }
 }
