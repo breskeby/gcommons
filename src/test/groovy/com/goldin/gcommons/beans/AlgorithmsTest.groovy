@@ -40,10 +40,11 @@ class AlgorithmsTest extends BaseTest
         {
             int[] input    = new ArrayList( array[ 0 ] ) as int[] // Making a copy for println() below
             int[] expected = array[ 1 ] as int[]
+            long  t        = System.currentTimeMillis()
             int[] output   = algBean.sort( array[ 0 ] as int[], option )
 
             assert output == expected, "$output != $expected"
-            println "$input => $output"
+            println "$input => $output, [${ System.currentTimeMillis() - t }] ms"
         }
     }
 
