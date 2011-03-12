@@ -66,6 +66,16 @@ class AlgorithmsBean extends BaseBean
 
 
     /**
+     * Moves elements N positions right in the range starting at "start" and ending at "end" indexes.
+     */
+    private void moveRight( int[] data, int start, int end, int positions = 1 )
+    {
+        assert ( end > start ), "moverRight( $data, $start, $end ): [$end] <= [$start]"
+        for ( int j in (( end - 1 ) .. start )) { data[ j + positions ] = data[ j ]}
+    }
+
+
+    /**
      * "Insertion sort" of data specified, modifies the original array.
      * http://en.wikipedia.org/wiki/Insert_sort
      *
@@ -74,38 +84,31 @@ class AlgorithmsBean extends BaseBean
      */
     private int[] insertionSort ( int[] data, int arrayStart = 0, int arrayEnd = data.length )
     {
+        if (( arrayEnd - arrayStart ) < 2 )
+        {
+            return data
+        }
+        
         /**
          * Finds index to insert the element specified in the range ending at "end" index.
          */
         def findInsertIndex = {
             int elem, int start, int end ->
             
-            for ( int j in (( end - 1 ) .. start )) { if ( data[ j ] <= elem ){ return ( j + 1 ) }}
+            for ( int j in ( end ..< start )) { if ( data[ j - 1 ] <= elem ){ return j }}
             start
         }
 
-        /**
-         * Move elements right in the range starting at "start" and ending at "end" indexes.
-         */
-        def moveRight = {
-            int start, int end ->
-
-            assert ( end > start ), "moverRight( $data, $start, $end ): [$end] <= [$start]"
-            for ( int j in (( end - 1 ) .. start )) { data[ j + 1 ] = data[ j ]}
-        }
-
-        if ( arrayEnd - arrayStart )
+        assert ( arrayEnd > arrayStart )
+        for ( int j in (( arrayStart + 1 ) ..< arrayEnd ))
         {
-            for ( j in (( arrayStart + 1 ) ..< arrayEnd ))
-            {
-                int elem        = data[ j ]
-                int insertIndex = findInsertIndex( elem, arrayStart, j )
+            int elem        = data[ j ]
+            int insertIndex = findInsertIndex( elem, arrayStart, j )
 
-                if ( insertIndex < j )
-                {   // If there's a need to move, elem can be at the right place already
-                    moveRight( insertIndex, j )
-                    data[ insertIndex ] = elem
-                }
+            if ( insertIndex < j )
+            {   // If there's a need to move, elem can be at the right place already
+                moveRight( data, insertIndex, j )
+                data[ insertIndex ] = elem
             }
         }
 
