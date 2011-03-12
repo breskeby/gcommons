@@ -3,7 +3,7 @@ package com.goldin.gcommons.beans
 import com.goldin.gcommons.BaseTest
 import org.junit.Test
 
-/**
+ /**
  * Tests {@link AlgorithmsBean}
  */
 class AlgorithmsTest extends BaseTest
@@ -36,6 +36,8 @@ class AlgorithmsTest extends BaseTest
 
     void applySort( SortOption option )
     {
+        println "Testing [$option] sorting method"
+
         for ( array in arrays )
         {
             int[] input    = new ArrayList( array[ 0 ] ) as int[] // Making a copy for println() below
@@ -46,6 +48,22 @@ class AlgorithmsTest extends BaseTest
             assert output == expected, "$output != $expected"
             println "$input => $output, [${ System.currentTimeMillis() - t }] ms"
         }
+
+        print "Testing random arrays: "
+
+        def random = new Random( new Random( System.currentTimeMillis()).nextLong())
+        def array  = new int[ 8000 ]
+
+        3.times {
+            for ( j in ( 0 ..< array.length )){ array[ j ] = random.nextInt() }
+
+            long t = System.currentTimeMillis()
+            algBean.sort( array, option )
+            print "[${ System.currentTimeMillis() - t }] ms, "
+        }
+
+        println "Ok"
+
     }
 
 
@@ -60,4 +78,8 @@ class AlgorithmsTest extends BaseTest
     @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
     @Test
     void mergeSort () { applySort( SortOption.Merge ) }
+
+    @SuppressWarnings( 'JUnitTestMethodWithoutAssert' )
+    @Test
+    void quickSort () { applySort( SortOption.Quick ) }
 }

@@ -123,50 +123,60 @@ class AlgorithmsBean extends BaseBean
      * @param data input array to sort
      * @return same array object with its elements sorted in increasing order
      */
-    private int[] mergeSort( int[] data )
+    private int[] mergeSort( int[]   data,
+                             int     start           = 0,
+                             int     middle          = -1,
+                             int     end             = data.length,
+                             int[]   helper          = new int[ data.length ],
+                             Closure findMiddleIndex = { int s, int e -> ( s + (( e - s ) >> 1 )) } )
     {
-        int[] helper        = new int[ data.length ]
-        def findMiddleIndex = { int start, int end -> ( start + (( end - start ) >> 1 )) }
+        if ( middle < 0 )
+        {
+            /**
+             * First invocation
+             */
+            mergeSort( data, start, findMiddleIndex( start, end ), end, helper, findMiddleIndex )
+        }
+        else
+        {
+            /**
+             * Sorting two "halfs"
+             */
 
-        /**
-         * Sorts and merges two "halfs" specified:
-         * - First half starts at index "start" and ends at index "middle - 1"
-         * - Second half starts at index "middle" and ends at index "end - 1"
-         */
-        Closure mergeSortHelper
-        mergeSortHelper = {
-            int start, int middle, int end ->
-
-            if (( middle - start ) < 8 )
+            if (( middle - start ) < 10 )
             {
-                insertionSort( data, 0, middle   )
-                insertionSort( data, middle, end )
+                insertionSort( data, start,  middle )
+                insertionSort( data, middle, end    )
             }
             else
             {
-                mergeSortHelper( 0, findMiddleIndex( 0, middle ), middle )
-                mergeSortHelper( middle, findMiddleIndex( middle, end ), end )
+                mergeSort( data, start,  findMiddleIndex( start, middle ), middle, helper, findMiddleIndex )
+                mergeSort( data, middle, findMiddleIndex( middle, end ),   end,    helper, findMiddleIndex )
             }
 
+            /**
+             * Merging two "halfs"
+             */
+            
             if (( middle > start ) && ( data[ middle ] < data [ middle - 1 ] ))
             {
                 def leftIndex  = start
                 def rightIndex = middle
+                
                 for ( helperIndex in ( start ..< end ))
                 {
-                    def dataIndex = ( leftIndex  >= middle ) ?                   rightIndex++ :
-                                    ( rightIndex >= end    ) ?                   leftIndex++  :
-                                    ( data[ leftIndex ] < data[ rightIndex ] ) ? leftIndex++  :
-                                                                                 rightIndex++
+                    def dataIndex = (( leftIndex < middle ) && (( rightIndex == end ) || ( data[ leftIndex ] < data[ rightIndex ] ))) ?
+                                    leftIndex++ :
+                                    rightIndex++
 
                     helper[ helperIndex ] = data[ dataIndex ]
                 }
 
+                assert ( leftIndex == middle ) && ( rightIndex == end )
                 System.arraycopy( helper, start, data, start, ( end - start ))
             }
         }
 
-        mergeSortHelper( 0, findMiddleIndex( 0, data.length ), data.length )
         data
     }
 
@@ -178,8 +188,31 @@ class AlgorithmsBean extends BaseBean
      * @param data input array to sort
      * @return same array object with its elements sorted in increasing order
      */
-    private int[] quickSort( int[] data )
+    private int[] quickSort( int[] data, int start = 0, int end = data.length )
     {
+        assert end >= start
+        if (( end - start ) < 8 ) { return insertionSort( data, start, end ) }
+
+        int pivot      = data[ start ]
+        int pivotIndex = start
+
+        assert (( end - start ) > 1 )
+        for ( int j in (( start + 1 ) ..< end ))
+        {
+            int elem = data[ j ]
+            if ( elem < pivot )
+            {
+                moveRight( data, pivotIndex, j )
+                data[ pivotIndex ] = elem
+                pivotIndex++
+            }
+
+            if ( pivotIndex < end ) { assert data[ pivotIndex ] == pivot }
+        }
+
+        if ( pivotIndex > ( start + 1 )){ quickSort( data, start, pivotIndex   ) }
+        if ( pivotIndex < ( end - 2   )){ quickSort( data, pivotIndex + 1, end ) }
+        
         data
     }
 
