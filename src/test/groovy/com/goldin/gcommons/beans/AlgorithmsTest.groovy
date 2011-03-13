@@ -201,4 +201,32 @@ class AlgorithmsTest extends BaseTest
         assert [  4,  7 ] == maxRange( [ -1, 1, 2, -4, 4, 205, -101, 100 ] )
         assert [  4, 12 ] == maxRange( [ -1, 1, 2, -4, 6, 5, -10, 100, 20, -50, 51, -50, 49, -100, -200, 0, 3, -5, 6 ] )
     }
+
+
+    @Test
+    void convert()
+    {
+        def check = {
+            long number, int base, String result ->
+
+            assert result == algBean.convert( number, base )
+            println "[$number] = [$result], base [$base]"
+        }
+
+        check( 0,           2, '0'     )
+        check( 1,           2, '1'     )
+        check( 2,           2, '10'    )
+        check( 3,           2, '11'    )
+        check( 5,           2, '101'   )
+        check( 12345,      10, '12345' )
+        check( 12345,       2, '11000000111001' )
+        check( 12345,      16, '3039'   )
+        check( 678910,     10, '678910' )
+        check( 678910,      2, '10100101101111111110' )
+        check( 678910,      8, '2455776'  )
+        check( 678910,     16, 'A5BFE'    )
+        check( 3405691582, 16, 'CAFEBABE' )
+        check( 3735928559, 16, 'DEADBEEF' )
+        check( 2881150637, 16, 'ABBADEAD' )
+    }
 }

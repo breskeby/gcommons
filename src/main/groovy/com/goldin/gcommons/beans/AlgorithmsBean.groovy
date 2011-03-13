@@ -325,6 +325,34 @@ class AlgorithmsBean extends BaseBean
          ( elem <  middleElem ) ? binarySearch( data, elem, shift, start, middle   ) :
                                   binarySearch( data, elem, shift, middle + 1, end ))
     }
+
+    
+    /**
+     * Converts a number to a base-based String representation
+     * @param number number to convert
+     * @param base   conversion base, 2, 8, 10, 16, etc.
+     * @return       number converted using the base specified
+     */
+    String convert( long number, int base )
+    {
+        assert number > -1, "Number is [$number] - negative numbers are not supported"
+        assert base   >  1, "Conversion base is [$base] - conversion base should be 2 at least"
+        
+        def  result = new StringBuilder()
+        long sum    = 0
+
+        for ( int j = 0; ( sum != number ); j++ )
+        {
+            double multiplier = Math.pow( base, j )
+            int    digit      = (( long ) (( number - sum ) / multiplier ) % base ) // Negative for negative 'number'
+            sum              += ( digit * multiplier )
+
+            result.append( digit < 10 ? "${ Math.abs( digit )}" : Character.forDigit( digit, base ).toUpperCase())
+        }
+
+        def conversion = result.toString()
+        conversion.size() ? conversion.reverse() : '0'
+    }
 }
 
 
