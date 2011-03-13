@@ -22,11 +22,11 @@ class AlgorithmsBean extends BaseBean
      */
     int[] maxRange( int[] data )
     {
-        int              x1     = -1 // Start of range, inclusive
-        int              x2     = -1 // End of range, inclusive
-        int              sum    = 0  // Range sum
-        List<ArrayRange> ranges = [] // Ranges found
-        def newRange            = {  // Closure invoked when a new range is found
+        int        x1       = -1   // Start of range, inclusive
+        int        x2       = -1   // End of range, inclusive
+        int        sum      = 0    // Range sum
+        ArrayRange maxRange = new ArrayRange( x1: -1, x2: -1, sum: -1 ) // Max range found so far
+        def newRange        = {    // Closure invoked when a new range is found
 
             assert x1 >  -1
             assert x2 >= x1
@@ -36,7 +36,9 @@ class AlgorithmsBean extends BaseBean
 
             // Calculating range sum from x1 to x2, using one-element array 'a' as inject() accumulator
             int rangeSum = (( x1 .. x2 ).inject( [0] as int[] ){ int[] a, int j -> a[ 0 ] += data[ j ]; a })[ 0 ]
-            ranges << new ArrayRange( x1: x1, x2: x2, sum: rangeSum )
+
+            maxRange = ( maxRange.sum < rangeSum ) ? new ArrayRange( x1: x1, x2: x2, sum: rangeSum ) :
+                                                     maxRange
         }
 
         for ( j in ( 0 ..< data.length ))
@@ -77,17 +79,7 @@ class AlgorithmsBean extends BaseBean
             newRange()
         }
 
-        if ( ranges )
-        {
-            def maxRange = ranges.first()
-            for ( range in ranges ) { maxRange = ( range.sum > maxRange.sum ) ? range : maxRange }
-            
-            [ maxRange.x1, maxRange.x2 ]
-        }
-        else
-        {
-            [ -1, -1 ]
-        }
+        [ maxRange.x1, maxRange.x2 ]
     }
 
     
