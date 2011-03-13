@@ -305,21 +305,25 @@ class AlgorithmsBean extends BaseBean
     /**
      * Makes a binary search on data sorted, looking for element provided.
      * 
-     * @param data input data
-     * @param elem element to search for
-     * @param start search start index
+     * @param data  input data
+     * @param elem  element to search for
+     * @param shift elements shift in a sorted array
+     * @param start search start index, inclusive
      * @param end   search end index, exclusive
      * @return      element index or -1 if not found
      */
-    int binarySearch ( int[] data, int elem, int start = 0, int end = data.length )
+    int binarySearch ( int[] data, int elem, int shift = 0, int start = 0, int end = data.length )
     {
         if ( start == end ) { return -1 }
 
-        int middle = (( start + end ) >> 1 )
+        shift             = (( shift < 0 ) ? shift + data.length : shift )
+        int middle        = (( start + end ) >> 1 )
+        int middleShifted = (( middle + shift ) % data.length )
+        int middleElem    = data[ middleShifted ]
         
-        (( elem == data[ middle ] ) ? middle :
-         ( elem <  data[ middle ] ) ? binarySearch( data, elem, start, middle   ) :
-                                      binarySearch( data, elem, middle + 1, end ))
+        (( elem == middleElem ) ? middleShifted :
+         ( elem <  middleElem ) ? binarySearch( data, elem, shift, start, middle   ) :
+                                  binarySearch( data, elem, shift, middle + 1, end ))
     }
 }
 

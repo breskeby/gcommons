@@ -71,14 +71,24 @@ class AlgorithmsTest extends BaseTest
             println "$input => $output"
         }
 
-        def randomArrays = randomArrays( false )
-        print "Testing sort of random arrays of size [${ randomArrays.first().size()}]: "
+        def arrays = randomArrays( false )
+        print "Testing sort of random arrays of size [${ arrays.first().size()}]: "
 
-        for ( int[] randomArray in randomArrays )
+        for ( int[] randomArray in arrays )
         {
             long t = System.currentTimeMillis()
             algBean.sort( randomArray, option )
             print "[${ System.currentTimeMillis() - t }] ms, "
+        }
+
+        println "Ok"
+
+        print "Testing sort of random arrays of random size: "
+        for ( int[] randomArray in randomArrays())
+        {
+            long t = System.currentTimeMillis()
+            algBean.sort( randomArray, option )
+            print "[$randomArray.length] - [${ System.currentTimeMillis() - t }] ms, "
         }
 
         println "Ok"
@@ -145,6 +155,25 @@ class AlgorithmsTest extends BaseTest
             
             print "[$sortedArray.length] - [${ System.currentTimeMillis() - t }] ms, "
         }
+
+        /**
+         * "Find an Item in a Sorted Array with Shifted Elements"
+         * http://www.technicalinterviewquestions.net/2009/02/sorted-array-shifted-elements-search.html
+         */
+        assert 0 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 2 )
+        assert 0 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 2, 6  )
+        assert 0 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 2, -6 )
+        assert 1 == algBean.binarySearch( [ 11, 2, 3, 4, 8, 10 ] as int[], 2, 1  )
+        assert 1 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 3 )
+        assert 3 == algBean.binarySearch( [ 10, 11, 2, 3, 4, 8 ] as int[], 3, 2  )
+        assert 2 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 4 )
+        assert 1 == algBean.binarySearch( [ 3, 4, 8, 10, 11, 2 ] as int[], 4, -1 )
+        assert 0 == algBean.binarySearch( [ 4, 8, 10, 11, 2, 3 ] as int[], 4, -2 )
+        assert 3 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 8 )
+        assert 4 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 10 )
+        assert 5 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 11 )
+        assert 5 == algBean.binarySearch( [ 2, 3, 4, 8, 10, 11 ] as int[], 11, 6 )
+        assert 4 == algBean.binarySearch( [ 3, 4, 8, 10, 11, 2 ] as int[], 11, 5 )
 
         println "Ok"
     }
