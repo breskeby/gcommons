@@ -148,4 +148,28 @@ class AlgorithmsTest extends BaseTest
 
         println "Ok"
     }
+
+
+    @Test
+    void maxRange()
+    {
+        def maxRange = { List<Integer> list -> algBean.maxRange( list as int[] ) }
+
+        assert [ -1, -1 ] == maxRange( [] )
+        assert [  0,  0 ] == maxRange( [  1 ] )
+        assert [ -1, -1 ] == maxRange( [ -1 ] )
+        assert [  0,  1 ] == maxRange( [ 1, 2 ] )
+        assert [  0,  1 ] == maxRange( [ 1, 2, -3 ] )
+        assert [  0,  1 ] == maxRange( [ 1, 2, -3, 2 ] )
+        assert [  3,  3 ] == maxRange( [ 1, 2, -3, 4 ] )
+        assert [  0,  3 ] == maxRange( [ 2, 2, -3, 4 ] )
+        assert [  0,  1 ] == maxRange( [ 2, 5, -10, 4 ] )
+        assert [  3,  3 ] == maxRange( [ 2, 5, -10, 10 ] )
+        assert [  3,  5 ] == maxRange( [ 2, 5, -10, 10, 20, 30 ] )
+        assert [  5,  5 ] == maxRange( [ 2, 5, -10, 10, -20, 30 ] )
+        assert [  7,  7 ] == maxRange( [ -1, 1, 2, -3, 4, 5, -10,  100 ] )
+        assert [  7,  7 ] == maxRange( [ -1, 1, 2, -4, 4, 5, -10,  100 ] )
+        assert [  4,  7 ] == maxRange( [ -1, 1, 2, -4, 4, 205, -101, 100 ] )
+        assert [  4, 12 ] == maxRange( [ -1, 1, 2, -4, 6, 5, -10, 100, 20, -50, 51, -50, 49, -100, -200, 0, 3, -5, 6 ] )
+    }
 }

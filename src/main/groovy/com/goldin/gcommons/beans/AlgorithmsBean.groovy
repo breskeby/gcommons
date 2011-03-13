@@ -7,6 +7,99 @@ package com.goldin.gcommons.beans
 class AlgorithmsBean extends BaseBean
 {
 
+    /**
+     * {@link #maxRange(int[])} helper class.
+     */
+    private static class ArrayRange { int x1, x2, sum }
+    
+
+    /**
+     * Finds sub-array range with the largest sum:
+     * http://www.mytechinterviews.com/sub-array-with-the-largest-sum
+     * 
+     * @param data input data
+     * @return two-elements array with range start and end, both are -1 if no range found
+     */
+    int[] maxRange( int[] data )
+    {
+        int              x1     = -1 // Start of range, inclusive
+        int              x2     = -1 // End of range, inclusive
+        int              sum    = 0  // Range sum
+        List<ArrayRange> ranges = [] // Ranges found
+        def newRange            = {  // Closure invoked when a new range is found
+
+            assert x1 >  -1
+            assert x2 >= x1
+            assert (( x2 == ( data.length - 1 )) || ( data[ x2 + 1 ] < 1 ))
+            assert data[ x1 ] > -1
+            assert data[ x2 ] > -1
+
+            // Calculating range sum from x1 to x2, using one-element array 'a' as inject() accumulator
+            int rangeSum = (( x1 .. x2 ).inject( [0] as int[] ){ int[] a, int j -> a[ 0 ] += data[ j ]; a })[ 0 ]
+            ranges << new ArrayRange( x1: x1, x2: x2, sum: rangeSum )
+        }
+
+        for ( j in ( 0 ..< data.length ))
+        {
+            int elem = data[ j ]
+            sum += elem
+
+            if ( elem > 0 )
+            {
+                // Positive or zero element
+                if ( x1 < 0 )
+                {
+                    // Starting a new range
+                    x1  = j
+                    x2  = j
+                    sum = elem
+                }
+                else
+                {
+                    // Range right edge update
+                    x2 = j
+                }
+            }
+            else if (( elem < 0 ) && ( sum < 1 ) && ( x1 > -1 ))
+            {
+                // Negative element, sum went down to zero and we have a range open - need to close it
+                newRange()
+                x1  = -1
+                x2  = -1
+                sum = 0
+            }
+        }
+
+        if ( x1 > -1 )
+        {
+            // Range left unclosed
+            assert x2 >= x1
+            newRange()
+        }
+
+        if ( ranges )
+        {
+            def maxRange = ranges.first()
+            for ( range in ranges ) { maxRange = ( range.sum > maxRange.sum ) ? range : maxRange }
+            
+            [ maxRange.x1, maxRange.x2 ]
+        }
+        else
+        {
+            [ -1, -1 ]
+        }
+    }
+
+    
+
+    /**
+     * Sorts data provided using one of available algorithms.
+     *
+     * @param data     data to sort, will be modified and returned
+     * @param option   sorting algorithm
+     * @param validate whether result should be validated to be sorted
+     * @return         original data provided sorted
+    */
     int[] sort ( int[] data, SortOption option = SortOption.Merge, boolean validate = true )
     {
         int[] sortedData = ( option == SortOption.Selection ) ? selectionSort( data ) :
