@@ -48,7 +48,7 @@ class AlgorithmsBean extends BaseBean
 
             if ( elem > 0 )
             {
-                // Positive or zero element
+                // Positive element
                 if ( x1 < 0 )
                 {
                     // Starting a new range
