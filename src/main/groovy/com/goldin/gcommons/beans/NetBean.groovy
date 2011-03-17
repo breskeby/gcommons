@@ -167,6 +167,11 @@ class NetBean extends BaseBean
             }
         })
     }
+
+
+    void http( Map config, Closure callback )
+    {
+    }
 }
 
 

@@ -164,4 +164,16 @@ class NetBeanTest extends BaseTest
         }
     }
 
+
+
+    @Test
+    void testHttpGet()
+    {
+        /**
+         * http://groovy.codehaus.org/modules/http-builder/doc/get.html
+         */
+
+        netBean.http( [ host : 'google.com' ], {})
+    }
+
 }
