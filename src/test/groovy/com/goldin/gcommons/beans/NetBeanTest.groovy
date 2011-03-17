@@ -106,6 +106,7 @@ class NetBeanTest extends BaseTest
         assert 1 == indexFile.size()
         assert indexFile[ 0 ].name == 'index.html'
         assert indexFile[ 0 ].fullPath.endsWith( ':/index.html' )
+        assert indexFile[ 0 ].fullPath == ZYMIC_FTP + 'index.html'
         assert indexFile[ 0 ].path == '/index.html'
         assert indexFile[ 0 ].size == 1809
 
@@ -116,8 +117,13 @@ class NetBeanTest extends BaseTest
                                     'apache-maven-3.0.1/lib/wagon-provider-api-1.0-beta-7.jar',
                                     'apache-maven-3.0.1/lib/xercesMinimal-1.9.6.2.jar' ]
         assert jarFiles*.fullPath.every { it.startsWith( 'ftp://' ) && it.endsWith( '.jar' ) }
+
         assert jarFiles[ -2 ].fullPath.endsWith( ':/apache-maven-3.0.1/lib/wagon-provider-api-1.0-beta-7.jar' )
+        assert jarFiles[ -2 ].fullPath == ZYMIC_FTP + 'apache-maven-3.0.1/lib/wagon-provider-api-1.0-beta-7.jar'
+
         assert jarFiles[ -1 ].fullPath.endsWith( ':/apache-maven-3.0.1/lib/xercesMinimal-1.9.6.2.jar' )
+        assert jarFiles[ -1 ].fullPath == ZYMIC_FTP + 'apache-maven-3.0.1/lib/xercesMinimal-1.9.6.2.jar'
+
         assert jarFiles[ -2 ].path == '/apache-maven-3.0.1/lib/wagon-provider-api-1.0-beta-7.jar'
         assert jarFiles[ -1 ].path == '/apache-maven-3.0.1/lib/xercesMinimal-1.9.6.2.jar'
         assert jarFiles*.size  == [ 11063, 14991, 25516, 53227, 39798 ]
@@ -127,8 +133,13 @@ class NetBeanTest extends BaseTest
                                     'apache-maven-3.0.1/NOTICE.txt',
                                     'apache-maven-3.0.1/README.txt' ]
         assert txtFiles*.fullPath.every { it.startsWith( 'ftp://' ) && it.endsWith( '.txt' ) }
+
         assert txtFiles[ -2 ].fullPath.endsWith( ':/apache-maven-3.0.1/NOTICE.txt' )
+        assert txtFiles[ -2 ].fullPath == ZYMIC_FTP + 'apache-maven-3.0.1/NOTICE.txt'
+
         assert txtFiles[ -1 ].fullPath.endsWith( ':/apache-maven-3.0.1/README.txt' )
+        assert txtFiles[ -1 ].fullPath == ZYMIC_FTP + 'apache-maven-3.0.1/README.txt'
+
         assert txtFiles[ -2 ].path == '/apache-maven-3.0.1/NOTICE.txt'
         assert txtFiles[ -1 ].path == '/apache-maven-3.0.1/README.txt'
         assert txtFiles*.size  == [ 11560, 1030, 2559 ]
