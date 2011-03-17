@@ -170,17 +170,22 @@ class NetBean extends BaseBean
 }
 
 
+/**
+ * {@link FTPFile} extension providing file's full {@code "ftp://user:pass@server:/path"} and remote path {@code "/path"}.
+ */
 class GFTPFile
 {
     @Delegate FTPFile file
 
+    String fullPath
     String path
 
     GFTPFile ( FTPFile file, String path )
     {
         assert file && file.name && path, "File [$file], name [$file.name], path [$path] - should be defined"
 
-        this.file = file
-        this.path = "$path/$file.name".replace( '\\', '/' ).replaceAll( /(?<!ftp:)\/+/, '/' )
+        this.file     = file
+        this.fullPath = "$path/$file.name".replace( '\\', '/' ).replaceAll( /(?<!ftp:)\/+/, '/' )
+        this.path     = this.fullPath.replaceAll( /.+:/, '' ) // "ftp://user:pass@server:/path" => "/path"
     }
 }
