@@ -27,19 +27,23 @@ repositories {
 dependencies {
     groovy      "org.codehaus.groovy:groovy-all:$groovyVersion"
 
-    compile   ( "org.codehaus.groovy.modules.http-builder:http-builder:$httpBuilderVersion" ){ exclude group: 'org.codehaus.groovy', module: 'groovy' }
+    compile   ( "org.codehaus.groovy.modules.http-builder:http-builder:$httpBuilderVersion" ){
+        exclude group: 'org.codehaus.groovy', module: 'groovy'
+        exclude group: 'org.apache.httpcomponents'
+    }
+    
     compile     "org.codehaus.groovy:groovy-all:$groovyVersion",
                 "org.apache.ant:ant:$antVersion",
                 "org.springframework:spring-context:$springVersion",
                 "de.schlichtherle:truezip:$truezipVersion",
-                "org.apache.commons:commons-exec:1.1",
-                "commons-net:commons-net:2.2",
-                "org.slf4j:slf4j-api:1.6.1",
-                "ch.qos.logback:logback-classic:0.9.28", // Logback patch in MopHelper
-                "net.sf.json-lib:json-lib:2.4:jdk15"
+                'org.apache.commons:commons-exec:1.1',
+                'commons-net:commons-net:2.2',
+                'org.slf4j:slf4j-api:1.6.1',
+                'ch.qos.logback:logback-classic:0.9.28', // Logback patch in MopHelper
+                'net.sf.json-lib:json-lib:2.4:jdk15'
 
     runtime     "org.apache.ant:ant-commons-net:$antVersion",
-                "org.apache.httpcomponents:httpclient:4.1"
+                'org.apache.httpcomponents:httpclient:4.1'
 
     testCompile "org.springframework:spring-test:$springVersion",
                 "junit:junit:$junitVersion"
