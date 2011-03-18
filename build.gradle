@@ -35,10 +35,10 @@ dependencies {
                 "org.apache.commons:commons-exec:1.1",
                 "commons-net:commons-net:2.2",
                 "org.slf4j:slf4j-api:1.6.1",
+                "ch.qos.logback:logback-classic:0.9.28", // Logback patch in MopHelper
                 "net.sf.json-lib:json-lib:2.4:jdk15"
 
     runtime     "org.apache.ant:ant-commons-net:$antVersion",
-                "ch.qos.logback:logback-classic:0.9.28",
                 "org.apache.httpcomponents:httpclient:4.1"
 
     testCompile "org.springframework:spring-test:$springVersion",
