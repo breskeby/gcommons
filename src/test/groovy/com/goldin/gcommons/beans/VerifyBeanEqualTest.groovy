@@ -30,10 +30,10 @@ class VerifyBeanEqualTest extends BaseTest
         shouldFailAssert { verifyBean.equal( new File( "doesn't exist" ),
                                              new File( "doesn't exist" ) ) }
 
-        shouldFailAssert { verifyBean.equal( new File( constantsBean.USER_DIR_FILE, '1.txt' ),
-                                             new File( constantsBean.USER_DIR_FILE, '1.txt' )) }
+        shouldFailAssert { verifyBean.equal( new File( constantsBean.USER_DIR_FILE, '1111.txt' ),
+                                             new File( constantsBean.USER_DIR_FILE, '2222.txt' )) }
 
-        shouldFailAssert { verifyBean.equal( new File( constantsBean.USER_DIR_FILE, '1.txt' ),
+        shouldFailAssert { verifyBean.equal( new File( constantsBean.USER_DIR_FILE, '3333.txt' ),
                                              constantsBean.USER_DIR_FILE) }
 
         def file = new File( constantsBean.USER_HOME_FILE, 'a.txt' )
