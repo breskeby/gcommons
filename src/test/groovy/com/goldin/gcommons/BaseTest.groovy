@@ -17,11 +17,11 @@ class BaseTest
     final ConstantsBean  constantsBean = GCommons.constants()
     final VerifyBean     verifyBean    = GCommons.verify()
     final GeneralBean    generalBean   = GCommons.general()
+    final IOBean         ioBean        = GCommons.io()
     final FileBean       fileBean      = GCommons.file()
     final NetBean        netBean       = GCommons.net()
     final GroovyBean     groovyBean    = GCommons.groovy()
     final AlgorithmsBean algBean       = GCommons.alg()
-    final IOBean         ioBean        = GCommons.io()
 
 
     /**
