@@ -2,6 +2,7 @@ package com.goldin.gcommons.beans
 
 import com.goldin.gcommons.GCommons
 import java.lang.reflect.Array
+import org.codehaus.groovy.reflection.ReflectionUtils
 import org.springframework.util.AntPathMatcher
 import org.apache.commons.exec.*
 
@@ -138,7 +139,7 @@ class GeneralBean extends BaseBean
         }
     }
 
-    
+
     /**
      * Determines if current OS is Windows according to "os.name" system property
      * @return true  if current OS is Windows,
@@ -219,6 +220,54 @@ class GeneralBean extends BaseBean
                 assert false : "Unknown option [$option]. Known options are ${ ExecOption.values() }"
         }
     }
+
+
+    /**
+     * Creates a decorated multi-line <code>Collection</code> representation where each element is prepended
+     * with a prefix and optional space.
+     *
+     * @param          c <code>Collection</code> to iterate
+     * @param prefix   decoration prefix
+     * @param padSize  elements spacing, starting from the second element
+     * @param crlf     line separator to use, system's 'line.separator' by default
+     * @return         multi-line <code>Collection</code> representation where each element is prepended with a prefix,
+     *                 empty <code>String</code> if collection is empty
+     */
+    String stars ( Collection c, String prefix = '* ', int padSize = 0, String crlf = constants.CRLF )
+    {
+        ( c ? "$prefix[${ c.join( "]$crlf${ ' ' * padSize }$prefix[") }]" : '' )
+    }
+
+
+    /**
+     *
+     * @param resource
+     * @return
+     */
+    InputStream resource( String resource )
+    {
+        def callingClass = ReflectionUtils.getCallingClass( 0 )
+        def stream       = callingClass.getResourceAsStream( verify.notNullOrEmpty(( String ) resource ))
+
+        if ( ! stream )
+        {
+            def urls = ( callingClass.classLoader instanceof URLClassLoader ) ?
+                (( URLClassLoader ) callingClass.classLoader).URLs :
+                []
+            assert false, "Failed to load resource [$resource] using ClassLoader of class [$callingClass.name]:\n${ stars( urls as List ) }"
+        }
+
+        stream
+    }
+
+
+    /**
+     *
+     * @param resourceName
+     * @param charset
+     * @return
+     */
+    String resourceText( String resourceName, String charset = 'UTF-8' ) { resource( resourceName ).getText( charset ) }
 }
 
 

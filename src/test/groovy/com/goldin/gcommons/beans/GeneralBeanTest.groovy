@@ -269,7 +269,7 @@ class GeneralBeanTest extends BaseTest
         assert []  == generalBean.choose( null, [], [:], null )
     }
 
-    
+
     @Test
     void shouldExecute()
     {
@@ -295,4 +295,59 @@ class GeneralBeanTest extends BaseTest
 
         fileBean.delete( tempFile )
     }
+
+
+    @Test
+    void testStars()
+    {
+        def check = {
+            String expected, List<String> input, String prefix = '* ', int padSize = 0 ->
+            assert expected.replaceAll( /^\s*/, '' ).
+                            replaceAll( /\r?\n/, constantsBean.CRLF )  == generalBean.stars( input, prefix, padSize )
+        }
+
+        check( '',       [] )
+        check( '* [aa]', [ 'aa' ] )
+        check( '''
+* [aa]
+* [bb]
+* [cc]''', [ 'aa', 'bb', 'cc' ] )
+
+         check( '''
+$ [1]
+$ [22]
+$ [333]''', [ '1', '22', '333' ], '$ ' )
+
+         check( '''
+% [1]
+   % [22]
+   % [333]''', [ '1', '22', '333' ], '% ', 3 )
+
+        shouldFailAssert { shouldFailAssert {
+            check( '''
+* [aa]
+* [bb]
+* [cc]''', [ 'aa', 'bb', 'cc' ] )
+        }}
+
+        shouldFailAssert {
+            check( '''
+* [aa]
+ * [bb]
+* [cc]''', [ 'aa', 'bb', 'cc' ] )
+        }
+
+        shouldFailAssert {
+            check( '''
+$ [aa]
+$ [cc]''', [ 'aa', 'cc' ], '$' )
+        }
+
+        shouldFailAssert { shouldFailAssert {
+            check( '''
+$ [aa]
+$ [cc]''', [ 'aa', 'cc' ], '$ ' )
+        }}
+
+     }
 }

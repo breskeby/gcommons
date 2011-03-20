@@ -1,12 +1,20 @@
 package com.goldin.gcommons.beans
 
+import groovyx.net.http.ContentType
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.Method
 import java.util.regex.Matcher
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPFile
 import org.apache.commons.net.ftp.FTPReply
+import static groovyx.net.http.ContentType.JSON
+import static groovyx.net.http.ContentType.XML
+import static groovyx.net.http.Method.GET
+import static groovyx.net.http.Method.POST
 
- /**
+
+/**
  * Network-related helper methods.
  */
 class NetBean extends BaseBean
@@ -171,6 +179,30 @@ class NetBean extends BaseBean
 
     void http( Map config, Closure callback )
     {
+        /**
+         * Copying configuration map.
+         * Every time a value is read it is removed from the copy and we verify that it is empty when all values
+         * are read - to prevent user errors when wrong keys are specified.
+         */
+        Map<String, String> configCopy = new HashMap( config )
+        def c                          = { String key -> configCopy.remove( key ) }
+        Closure<Boolean>  readBoolean  = { Object value, boolean defaultValue -> ( value == null ) ? defaultValue : (( boolean ) value ) }
+
+        String       charset          = c( 'charset' )     ?: 'UTF-8'
+        String       contentType      = c( 'contentType' ) ?: "text/xml; charset=$charset"
+        String       path             = c( 'path' )
+        String       resource         = c( 'resource' )
+        boolean      passObject       = readBoolean( c( 'object'           ), false ) // false by default
+        boolean      passModel        = readBoolean( c( 'model'            ), false ) // false by default
+        boolean      failOnError      = readBoolean( c( 'failOnError'      ), true  ) // true  by default
+        boolean      verbose          = readBoolean( c( 'verbose'          ), true  ) // true  by default
+        boolean      checkContentType = readBoolean( c( 'checkContentType' ), true  ) // true  by default
+        ContentType  type             = JSON.contentTypeStrings.grep( contentType ) ? JSON : XML
+        String       postData         = resource ? general.resourceText( resource ) : c( 'data' ) // Allowed to be null
+        Map          extraHeaders     = ( Map         ) c( 'headers' )
+        Method       method           = ( Method      ) c( 'method'  ) ?: ( postData ? POST : GET )
+        HTTPBuilder  service          = ( HTTPBuilder ) c( 'service' )
+
     }
 }
 
