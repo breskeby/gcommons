@@ -19,6 +19,13 @@
           p:constants-ref         = "constants"
           p:verify-ref            = "verify"/>
 
+    <bean name                    = "io"
+          class                   = "com.goldin.gcommons.beans.IOBean"
+          p:constants-ref         = "constants"
+          p:verify-ref            = "verify"
+          p:general-ref           = "general"
+          p:file-ref              = "file"/>
+
     <bean name                    = "file"
           class                   = "com.goldin.gcommons.beans.FileBean"
           p:constants-ref         = "constants"
@@ -31,6 +38,7 @@
           p:constants-ref         = "constants"
           p:verify-ref            = "verify"
           p:general-ref           = "general"
+          p:io-ref                = "io"
           p:file-ref              = "file"/>
 
     <bean name                    = "verifyEqualHelper"
@@ -38,13 +46,7 @@
           p:constants-ref         = "constants"
           p:verify-ref            = "verify"
           p:general-ref           = "general"
-          p:file-ref              = "file"/>
-
-    <bean name                    = "io"
-          class                   = "com.goldin.gcommons.beans.IOBean"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
+          p:io-ref                = "io"
           p:file-ref              = "file"/>
 
     <bean name                    = "net"
@@ -52,6 +54,7 @@
           p:constants-ref         = "constants"
           p:verify-ref            = "verify"
           p:general-ref           = "general"
+          p:io-ref                = "io"
           p:file-ref              = "file"/>
 
     <bean name                    = "groovy"
@@ -59,6 +62,7 @@
           p:constants-ref         = "constants"
           p:verify-ref            = "verify"
           p:general-ref           = "general"
+          p:io-ref                = "io"
           p:file-ref              = "file"/>
 
     <bean name                    = "algorithms"
@@ -66,5 +70,6 @@
           p:constants-ref         = "constants"
           p:verify-ref            = "verify"
           p:general-ref           = "general"
+          p:io-ref                = "io"
           p:file-ref              = "file"/>
 </beans>

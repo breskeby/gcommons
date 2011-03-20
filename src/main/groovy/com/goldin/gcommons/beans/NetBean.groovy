@@ -198,7 +198,7 @@ class NetBean extends BaseBean
         boolean      verbose          = readBoolean( c( 'verbose'          ), true  ) // true  by default
         boolean      checkContentType = readBoolean( c( 'checkContentType' ), true  ) // true  by default
         ContentType  type             = JSON.contentTypeStrings.grep( contentType ) ? JSON : XML
-        String       postData         = resource ? general.resourceText( resource ) : c( 'data' ) // Allowed to be null
+        String       postData         = resource ? io.resourceText( resource ) : c( 'data' ) // Allowed to be null
         Map          extraHeaders     = ( Map         ) c( 'headers' )
         Method       method           = ( Method      ) c( 'method'  ) ?: ( postData ? POST : GET )
         HTTPBuilder  service          = ( HTTPBuilder ) c( 'service' )

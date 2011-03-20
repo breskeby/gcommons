@@ -19,11 +19,6 @@ import org.springframework.beans.factory.InitializingBean
 class FileBean extends BaseBean implements InitializingBean
 {
     /**
-     * Set by Spring
-     */
-    IOBean io
-
-    /**
      * Archive extensions supported by ZIP and TAR drivers
      */
     Set<String> ZIP_EXTENSIONS
