@@ -21,8 +21,9 @@ class BaseTest
     final NetBean        netBean       = GCommons.net()
     final GroovyBean     groovyBean    = GCommons.groovy()
     final AlgorithmsBean algBean       = GCommons.alg()
+    final IOBean         ioBean        = GCommons.io()
 
-    
+
     /**
      * Retrieves test archives map: name => unpacked size.
      * @return test archives map: name => unpacked size.
@@ -36,7 +37,7 @@ class BaseTest
 
     /**
      * Retrieves test resource specified.
-     * 
+     *
      * @param path resource path
      * @return test resource specified
      */
@@ -79,7 +80,7 @@ class BaseTest
 
     /**
      * Verifies both lists specified contain identical elements.
-     * 
+     *
      * @param l1 first list to check
      * @param l2 second list to check
      */

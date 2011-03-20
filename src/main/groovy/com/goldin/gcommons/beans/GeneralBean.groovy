@@ -2,7 +2,6 @@ package com.goldin.gcommons.beans
 
 import com.goldin.gcommons.GCommons
 import java.lang.reflect.Array
-import org.codehaus.groovy.reflection.ReflectionUtils
 import org.springframework.util.AntPathMatcher
 import org.apache.commons.exec.*
 
@@ -237,37 +236,6 @@ class GeneralBean extends BaseBean
     {
         ( c ? "$prefix[${ c.join( "]$crlf${ ' ' * padSize }$prefix[") }]" : '' )
     }
-
-
-    /**
-     *
-     * @param resource
-     * @return
-     */
-    InputStream resource( String resource )
-    {
-        def callingClass = ReflectionUtils.getCallingClass( 0 )
-        def stream       = callingClass.getResourceAsStream( verify.notNullOrEmpty(( String ) resource ))
-
-        if ( ! stream )
-        {
-            def urls = ( callingClass.classLoader instanceof URLClassLoader ) ?
-                (( URLClassLoader ) callingClass.classLoader).URLs :
-                []
-            assert false, "Failed to load resource [$resource] using ClassLoader of class [$callingClass.name]:\n${ stars( urls as List ) }"
-        }
-
-        stream
-    }
-
-
-    /**
-     *
-     * @param resourceName
-     * @param charset
-     * @return
-     */
-    String resourceText( String resourceName, String charset = 'UTF-8' ) { resource( resourceName ).getText( charset ) }
 }
 
 
