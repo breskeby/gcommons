@@ -180,8 +180,12 @@ class NetBeanTest extends BaseTest
         def    files = netBean.listFiles( ZYMIC_FTP, [ '*' ], [], 5, true )
         assert files.size() == 11
         assert files.findAll { it.isDirectory() }.size() == 4
-//        assert files.findAll { it.isDirectory() }.every { it.path.contains( '/apache-maven-3.0.1/' ) }
         assert [ 'bin', 'boot', 'conf', 'lib' ].every{ String dirName -> files.any{ it.name.endsWith( dirName ) }}
+
+        files = netBean.listFiles( ZYMIC_FTP, [ 'apache-maven-3.0.1/*' ], [], 5, true )
+        assert files.size() == 16
+        assert files.findAll { it.isDirectory() }.size() == 0 // "apache-maven-3.0.1/*" pattern doesn't list directories any more
+        assert files.findAll { it.isDirectory() }.every { it.path.contains( '/apache-maven-3.0.1/' ) }
 
         files = netBean.listFiles( ZYMIC_FTP, [ '*' ] )
         assert files.size() == 7

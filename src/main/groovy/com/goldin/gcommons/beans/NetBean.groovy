@@ -165,7 +165,7 @@ class NetBean extends BaseBean
                     List<GFTPFile> gfiles = client.listFiles( globPattern ).
                                             findAll { it != null }.
                                             findAll { FTPFile  file -> (( file.name != '.' ) && ( file.name != '..' )) }.
-                                            collect { FTPFile  file -> new GFTPFile( file, remotePath ) }.
+                                            collect { FTPFile  file -> new GFTPFile( file, remotePath, globPattern ) }.
                                             findAll { GFTPFile file -> listDirectories ? true /* all entries */ : ( ! file.isDirectory()) /* files */ }.
                                             findAll { GFTPFile file -> ( ! excludes.any{ String exclude -> general.match( file.name, exclude ) ||
                                                                                                            exclude.endsWith( file.name ) } ) }
@@ -224,13 +224,19 @@ class GFTPFile
     String  path
     boolean directory
 
-    GFTPFile ( FTPFile file, String path )
+    GFTPFile ( FTPFile file, String remotePath, String globPattern )
     {
-        assert ( file != null ) && file.name && path, "File [$file], name [$file.name], path [$path] - should be defined"
+        assert ( file != null ) && file.name && remotePath, "File [$file], name [$file.name], path [$remotePath] - should be defined"
 
-        this.file      = file
-        this.fullPath  = "$path/$file.name".replace( '\\', '/' ).replaceAll( /(?<!ftp:)\/+/, '/' )
-        this.path      = this.fullPath.replaceAll( /.+:/, '' ) // "ftp://user:pass@server:/path" => "/path"
-        this.directory = file.rawListing.startsWith( 'd' )
+        this.file       = file
+        def patternPath = globPattern.replace( '\\', '/' ).replaceFirst( /^\//, '' ).replaceAll( /\/?[^\/]+$/, '' ) // "/aaaa/bbbb/*.zip" => "aaaa/bbbb"
+        def filePath    = "${ file.name.startsWith( patternPath ) ? '' : patternPath + '/' }$file.name"             // "aaaa/bbbb/file.zip"
+        this.fullPath   = "$remotePath/$filePath".replace( '\\', '/' ).replaceAll( /(?<!ftp:)\/+/, '/' )            // "ftp://user:pass@server:/path/aaaa/bbbb/file.zip"
+        this.path       = this.fullPath.replaceAll( /.+:/, '' )                                                     // "/path/aaaa/bbbb/file.zip"
+        this.directory  = file.rawListing.startsWith( 'd' )
     }
+
+
+    @Override
+    public String toString() { "[${ this.rawListing }][${ this.path }]" }
 }
