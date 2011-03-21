@@ -174,6 +174,19 @@ class NetBeanTest extends BaseTest
     }
 
 
+    @Test
+    void shouldListFtpDirectories()
+    {
+        def    files = netBean.listFiles( ZYMIC_FTP, [ '*' ], [], 5, true )
+        assert files.size() == 11
+        assert files.findAll { it.isDirectory() }.size() == 4
+//        assert files.findAll { it.isDirectory() }.every { it.path.contains( '/apache-maven-3.0.1/' ) }
+        assert [ 'bin', 'boot', 'conf', 'lib' ].every{ String dirName -> files.any{ it.name.endsWith( dirName ) }}
+
+        files = netBean.listFiles( ZYMIC_FTP, [ '*' ] )
+        assert files.size() == 7
+    }
+
 
     @Test
     void testHttpGet()

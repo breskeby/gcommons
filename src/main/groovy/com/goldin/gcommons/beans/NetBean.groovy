@@ -128,15 +128,19 @@ class NetBean extends BaseBean
     /**
      * Lists files on the FTP server specified.
      *
-     * @param remotePath remote path to establish ftp connection to: {@code ftp://<user>:<password>@<host>:<path>}
-     * @param globPatterns glob patterns of files to list: {@code "*.*"} or {@code "*.zip"}
-     * @param tries number of attempts
+     * @param remotePath      remote path to establish ftp connection to: <code>"ftp://<user>:<password>@<host>:<path>"</code>
+     * @param globPatterns    glob patterns of files to list: <code>"*.*"</code> or "<code>*.zip"</code>
+     * @param excludes        exclude patterns of files to exclude, empty by default
+     * @param tries           number of attempts, <code>5</code> by default
+     * @param listDirectories whether directories should be returned in result, <code>false</code> by default
+     *
      * @return FTP files listed by remote FTP server using glob patterns specified
      */
     List<GFTPFile> listFiles( String       remotePath,
-                              List<String> globPatterns = [ '*' ],
-                              List<String> excludes     = null,
-                              int          tries        = 5 )
+                              List<String> globPatterns    = [ '*' ],
+                              List<String> excludes        = null,
+                              int          tries           = 5,
+                              boolean      listDirectories = false )
     {
         verify.notNullOrEmpty( remotePath )
         assert tries > 0
@@ -152,21 +156,21 @@ class NetBean extends BaseBean
             {
                 FTPClient client ->
 
-                List<FTPFile> result = []
+                List<GFTPFile> result = []
 
                 getLog( this ).info( "Listing $globPatterns${ excludes ? '/' + excludes : '' } files .." )
 
                 for ( String globPattern in globPatterns*.trim().collect{ verify.notNullOrEmpty( it ) } )
                 {
-                    FTPFile[] files = client.listFiles( globPattern ).findAll {
-                        FTPFile file -> ( ! ( file == null )                     ||
-                                            ( file.rawListing.startsWith( 'd' )) ||
-                                            ( excludes.any{ String exclude -> general.match( file.name, exclude ) ||
-                                                                              exclude.endsWith( file.name ) } ))
-                    }
+                    List<GFTPFile> gfiles = client.listFiles( globPattern ).
+                                            findAll { it != null }.
+                                            findAll { FTPFile  file -> (( file.name != '.' ) && ( file.name != '..' )) }.
+                                            collect { FTPFile  file -> new GFTPFile( file, remotePath ) }.
+                                            findAll { GFTPFile file -> listDirectories ? true /* all entries */ : ( ! file.isDirectory()) /* files */ }.
+                                            findAll { GFTPFile file -> ( ! excludes.any{ String exclude -> general.match( file.name, exclude ) ||
+                                                                                                           exclude.endsWith( file.name ) } ) }
 
-                    getLog( this ).info( "[$globPattern] - [$files.length] file${ general.s( files.length ) }" )
-                    List<GFTPFile> gfiles = files.collect { FTPFile file -> new GFTPFile( file, remotePath ) }
+                    getLog( this ).info( "[$globPattern] - [${ gfiles.size() }] file${ general.s( gfiles.size() ) }" )
                     if ( getLog( this ).isDebugEnabled()) { getLog( this ).debug( "\n" + general.stars( gfiles*.path ))}
 
                     result.addAll( gfiles )
@@ -216,15 +220,17 @@ class GFTPFile
 {
     @Delegate FTPFile file
 
-    String fullPath
-    String path
+    String  fullPath
+    String  path
+    boolean directory
 
     GFTPFile ( FTPFile file, String path )
     {
-        assert file && file.name && path, "File [$file], name [$file.name], path [$path] - should be defined"
+        assert ( file != null ) && file.name && path, "File [$file], name [$file.name], path [$path] - should be defined"
 
-        this.file     = file
-        this.fullPath = "$path/$file.name".replace( '\\', '/' ).replaceAll( /(?<!ftp:)\/+/, '/' )
-        this.path     = this.fullPath.replaceAll( /.+:/, '' ) // "ftp://user:pass@server:/path" => "/path"
+        this.file      = file
+        this.fullPath  = "$path/$file.name".replace( '\\', '/' ).replaceAll( /(?<!ftp:)\/+/, '/' )
+        this.path      = this.fullPath.replaceAll( /.+:/, '' ) // "ftp://user:pass@server:/path" => "/path"
+        this.directory = file.rawListing.startsWith( 'd' )
     }
 }
