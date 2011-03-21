@@ -59,7 +59,7 @@ class IOBean extends BaseBean
             def urls = ( cl.classLoader instanceof URLClassLoader ) ?
                 (( URLClassLoader ) cl.classLoader).URLs :
                 []
-            assert false, "Failed to load resource [$resource] using ClassLoader of class [$cl.name]:\n${ stars( urls as List ) }"
+            assert false, "Failed to load resource [$resource] using ClassLoader of class [$cl.name]:\n${ general.stars( urls as List ) }"
         }
 
         stream

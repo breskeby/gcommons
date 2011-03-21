@@ -162,12 +162,11 @@ class NetBean extends BaseBean
                         FTPFile file -> ( ! excludes.any{ general.match( file.name, it ) || it.endsWith( file.name ) } )
                     }
 
-                    if ( getLog( this ).isDebugEnabled())
-                    {
-                        getLog( this ).debug( "[$globPattern]:\n${ files*.name.join( '\n' ) }" )
-                    }
+                    getLog( this ).info( "[$globPattern] - [$files.length] file${ general.s( files.length ) }" )
+                    List<GFTPFile> gfiles = files.collect { FTPFile file -> new GFTPFile( file, remotePath ) }
+                    if ( getLog( this ).isDebugEnabled()) { getLog( this ).debug( general.stars( gfiles*.path ))}
 
-                    result.addAll( files.collect { new GFTPFile( it, remotePath ) })
+                    result.addAll( gfiles )
                 }
 
                 getLog( this ).info( "[${ result.size() }] file${ general.s( result.size()) }" )

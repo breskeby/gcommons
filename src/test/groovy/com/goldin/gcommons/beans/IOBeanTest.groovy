@@ -22,6 +22,9 @@ class IOBeanTest extends BaseTest
         assert   ioBean.resource( 'gradle-0.9.jar' ).available()
         assert   ioBean.resource( '/gradle-0.9.jar' )
         assert   ioBean.resource( '/gradle-0.9.jar' ).available()
+
+        shouldFailAssert { ioBean.resource( 'emptyTestResourceAAA.txt' ) }
+        shouldFailAssert { ioBean.resource( 'testResourceAAA.txt' ) }
     }
 
     @Test
@@ -30,5 +33,8 @@ class IOBeanTest extends BaseTest
         assert '' ==  ioBean.resourceText( 'emptyTestResource.txt' )
         assert '' !=  ioBean.resourceText( 'testResource.txt' )
         assert "1-2-3-4:5-10:100<code>''''''</code>" ==  ioBean.resourceText( 'testResource.txt' )
+
+        shouldFailAssert { ioBean.resourceText( 'emptyTestResourceAAA.txt' ) }
+        shouldFailAssert { ioBean.resourceText( 'testResourceAAA.txt' ) }
     }
 }
