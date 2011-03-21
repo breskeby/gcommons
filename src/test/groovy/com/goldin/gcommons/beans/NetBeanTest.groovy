@@ -147,6 +147,15 @@ class NetBeanTest extends BaseTest
 
 
     @Test
+    void shouldListFtpFilesWithMultiplePatterns()
+    {
+        def files = netBean.listFiles( ZYMIC_FTP, [ '*.html', '*.zip', '*.jar', '*.xml' ] )
+        assert files.size() == 4
+        assert [ 'index.html', 'net.jar', 'net.zip', 'pom.xml' ].every { String filename -> files.any { GFTPFile file -> file.name.endsWith( filename ) }}
+    }
+
+
+    @Test
     void shouldListFtpFilesWithExcludes()
     {
         def fileNames = [ 'wagon-file-1.0-beta-7.jar', 'wagon-provider-api-1.0-beta-7.jar', 'xercesMinimal-1.9.6.2.jar' ]
