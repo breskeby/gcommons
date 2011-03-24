@@ -42,9 +42,7 @@ class GCommons
         {
             def logbackConfig = GCommons.classLoader.getResource( LOGBACK_CONFIG_NAME )
             def springConfig  = GCommons.classLoader.getResource( SPRING_CONFIG_NAME  )
-
-            assert logbackConfig, "Failed to load [$LOGBACK_CONFIG_NAME] resource"
-            assert springConfig,  "Failed to load [$SPRING_CONFIG_NAME] resource"
+            assert springConfig, "Failed to load [$SPRING_CONFIG_NAME] resource"
 
             java.util.logging.Logger.getLogger( 'org.springframework' ).level = java.util.logging.Level.WARNING
 
@@ -68,7 +66,7 @@ class GCommons
             }
 
             LoggerFactory.getLogger( GCommons.class ).info(
-                "GCommons context initialized using [$logbackConfig] and [$springConfig]: " +
+                "GCommons context initialized using ${ logbackConfig ? '[' + logbackConfig + '] and ' : '' }[$springConfig]: " +
                 "[$context.beanDefinitionCount] beans - $context.beanDefinitionNames (${ System.currentTimeMillis() - t } ms)" )
         }
 

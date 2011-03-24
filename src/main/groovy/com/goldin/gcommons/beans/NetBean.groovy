@@ -139,7 +139,7 @@ class NetBean extends BaseBean
     List<GFTPFile> listFiles( String       remotePath,
                               List<String> globPatterns    = [ '*' ],
                               List<String> excludes        = null,
-                              int          tries           = 5,
+                              int          tries           = 10,
                               boolean      listDirectories = false )
     {
         verify.notNullOrEmpty( remotePath )
