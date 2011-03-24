@@ -95,7 +95,7 @@ class NetBeanTest extends BaseTest
     }
 
 
-    @Ignore
+    @Test
     void shouldListFtpFiles()
     {
         def htmlFiles = netBean.listFiles( ZYMIC_FTP, ['*.html'] )
