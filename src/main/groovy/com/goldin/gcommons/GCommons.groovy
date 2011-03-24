@@ -29,10 +29,21 @@ class GCommons
      */
     private static ConfigurableApplicationContext getContext( boolean refresh, Map contextMap )
     {
-        ConfigurableApplicationContext context =
-            (( refresh            ) ? null    :
-             ( contextMap == null ) ? CONTEXT :
-                                      ( ConfigurableApplicationContext ) contextMap[ CONTEXT_KEY ] )
+        ConfigurableApplicationContext context = null
+
+        try
+        {
+            context = (( refresh            ) ? null    :
+                       ( contextMap == null ) ? CONTEXT :
+                                                ( ConfigurableApplicationContext ) contextMap[ CONTEXT_KEY ] )
+        }
+        catch ( ClassCastException ignored )
+        {
+            /**
+             * Happens when Spring classes are loaded by different classloaders.
+             * Context will be re-initialized.
+             */
+        }
 
         /**
          * Initialization is not protected with "synchronized": if executed concurrently the context will be initialized
