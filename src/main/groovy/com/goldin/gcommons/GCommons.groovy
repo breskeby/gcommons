@@ -1,8 +1,5 @@
 package com.goldin.gcommons
 
-//import
-//import
-
 
 import com.goldin.gcommons.util.MopHelper
 import org.slf4j.LoggerFactory
@@ -10,13 +7,12 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext
 import com.goldin.gcommons.beans.*
 
- /**
+
+/**
  * "GCommons" entry points
  */
 class GCommons
 {
-    static {  }
-
     private static final String CONTEXT_KEY = GCommons.class.name + "_CONTEXT"
     private static final String BEANS_KEY   = GCommons.class.name + "_BEANS"
     private static final String CONFIG_NAME = 'gcommons-application-context.xml'
