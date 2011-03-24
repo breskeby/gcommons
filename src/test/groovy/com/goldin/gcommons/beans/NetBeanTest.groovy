@@ -3,8 +3,9 @@ package com.goldin.gcommons.beans
 import com.goldin.gcommons.BaseTest
 import org.apache.commons.net.ftp.FTPFile
 import org.junit.Test
+import org.junit.Ignore
 
- /**
+/**
  * {@link NetBean} tests
  */
 class NetBeanTest extends BaseTest
@@ -94,7 +95,7 @@ class NetBeanTest extends BaseTest
     }
 
 
-    @Test
+    @Ignore
     void shouldListFtpFiles()
     {
         def htmlFiles = netBean.listFiles( ZYMIC_FTP, ['*.html'] )
