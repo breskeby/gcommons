@@ -1,8 +1,5 @@
 package com.goldin.gcommons
 
-import ch.qos.logback.classic.gaffer.ConfigurationDelegate
-import ch.qos.logback.classic.gaffer.GafferConfigurator
-import ch.qos.logback.core.util.ContextUtil
 import com.goldin.gcommons.util.MopHelper
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
@@ -73,22 +70,6 @@ class GCommons
             LoggerFactory.getLogger( GCommons.class ).info(
                 "GCommons context initialized using [$logbackConfig] and [$springConfig]: " +
                 "[$context.beanDefinitionCount] beans - $context.beanDefinitionNames (${ System.currentTimeMillis() - t } ms)" )
-
-            /**
-             * Patching logback - specifying CL when initializing a GroovyShell
-             * http://jira.qos.ch/browse/LBCLASSIC-252
-             * https://github.com/ceki/logback/blob/v_0.9.28/logback-classic/src/main/groovy/ch/qos/logback/classic/gaffer/GafferConfigurator.groovy#L45
-             */
-            GafferConfigurator.metaClass.run = {
-                String dslText->
-                Binding binding  = new Binding()
-                binding.setProperty( "hostname", ContextUtil.getLocalHostName())
-                Script dslScript = new GroovyShell( MopHelper.class.classLoader, binding ).parse( dslText ) // <==== Patch
-                dslScript.metaClass.mixin(ConfigurationDelegate)
-                dslScript.context = context
-                dslScript.metaClass.getDeclaredOrigin = { dslScript }
-                dslScript.run()
-            }
         }
 
         assert context
