@@ -1,12 +1,9 @@
 package com.goldin.gcommons.util
 
-import ch.qos.logback.classic.gaffer.ConfigurationDelegate
-import ch.qos.logback.classic.gaffer.GafferConfigurator
-import ch.qos.logback.core.util.ContextUtil
 import com.goldin.gcommons.beans.BaseBean
 import groovy.io.FileType
 
-/**
+ /**
  * MOP updates implementations.
  * http://evgeny-goldin.com/wiki/GCommons#MOP_Updates
  */
@@ -14,24 +11,9 @@ class MopHelper extends BaseBean
 {
     MopHelper ()
     {
-        /**
-         * Patching logback - specifying CL when initializing a GroovyShell
-         * http://jira.qos.ch/browse/LBCLASSIC-252
-         * https://github.com/ceki/logback/blob/v_0.9.28/logback-classic/src/main/groovy/ch/qos/logback/classic/gaffer/GafferConfigurator.groovy#L45
-         */
-        GafferConfigurator.metaClass.run = {
-            String dslText->
-            Binding binding  = new Binding()
-            binding.setProperty( "hostname", ContextUtil.getLocalHostName())
-            Script dslScript = new GroovyShell( MopHelper.class.classLoader, binding ).parse( dslText ) // <==== Patch
-            dslScript.metaClass.mixin(ConfigurationDelegate)
-            dslScript.setContext( context )
-            dslScript.metaClass.getDeclaredOrigin = { dslScript }
-            dslScript.run()
-        }
     }
 
-    
+
     /**
      * Container that holds callback invocation results.
      * See {@link #invokeCallback}
@@ -56,7 +38,7 @@ class MopHelper extends BaseBean
         boolean  detectLoops
     }
 
-    
+
     /**
      * Splits object to "pieces" with an "each"-like function specified by name.
      * http://evgeny-goldin.com/wiki/GCommons#MOP_Updates

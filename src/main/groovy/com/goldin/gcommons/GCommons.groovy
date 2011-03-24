@@ -1,26 +1,30 @@
 package com.goldin.gcommons
 
-
+import ch.qos.logback.classic.LoggerContext
+import ch.qos.logback.classic.gaffer.ConfigurationDelegate
+import ch.qos.logback.classic.gaffer.GafferConfigurator
+import ch.qos.logback.core.util.ContextUtil
+import ch.qos.logback.core.util.StatusPrinter
 import com.goldin.gcommons.util.MopHelper
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext
 import com.goldin.gcommons.beans.*
 
-
 /**
  * "GCommons" entry points
  */
 class GCommons
 {
-    private static final String CONTEXT_KEY = GCommons.class.name + "_CONTEXT"
-    private static final String BEANS_KEY   = GCommons.class.name + "_BEANS"
-    private static final String CONFIG_NAME = 'gcommons-application-context.xml'
+    private static final String CONTEXT_KEY         = GCommons.class.name + "_CONTEXT"
+    private static final String BEANS_KEY           = GCommons.class.name + "_BEANS"
+    private static final String SPRING_CONFIG_NAME  = 'gcommons-application-context.xml'
+    private static final String LOGBACK_CONFIG_NAME = 'logback.groovy'
 
     private static Map<Class<? extends BaseBean>, ? extends BaseBean> BEANS_MAP
     private static ConfigurableApplicationContext                     CONTEXT
 
-    
+
     /**
      * Gets a context instance, initializing it if necessary.
      *
@@ -31,19 +35,27 @@ class GCommons
     private static ConfigurableApplicationContext getContext( boolean refresh, Map contextMap )
     {
         ConfigurableApplicationContext context =
-            (( contextMap == null ) ? CONTEXT : ( ConfigurableApplicationContext ) contextMap[ CONTEXT_KEY ] )
-        
+            (( refresh            ) ? null    :
+             ( contextMap == null ) ? CONTEXT :
+                                      ( ConfigurableApplicationContext ) contextMap[ CONTEXT_KEY ] )
+
         /**
          * Initialization is not protected with "synchronized": if executed concurrently the context will be initialized
          * more than once, not a big deal.
          */
-        if (( refresh ) || ( context == null ))
+        if ( context == null )
         {
+            def logbackConfig = GCommons.classLoader.getResource( LOGBACK_CONFIG_NAME )
+            def springConfig  = GCommons.classLoader.getResource( SPRING_CONFIG_NAME  )
+
+            assert logbackConfig, "Failed to load [$LOGBACK_CONFIG_NAME] resource"
+            assert springConfig,  "Failed to load [$SPRING_CONFIG_NAME] resource"
+
             java.util.logging.Logger.getLogger( 'org.springframework' ).level = java.util.logging.Level.WARNING
-            
-            long t           = System.currentTimeMillis()
-            context          = new ClassPathXmlApplicationContext( CONFIG_NAME )
-            MopHelper helper = context.getBean( MopHelper.class )
+
+            long t                       = System.currentTimeMillis()
+            context                      = new ClassPathXmlApplicationContext( SPRING_CONFIG_NAME )
+            MopHelper helper             = context.getBean( MopHelper.class )
 
             Object.metaClass.splitWith   = { Object[] args                       -> helper.splitWith( delegate, args ) }
             File.metaClass.recurse       = { Map configs = [:], Closure callback -> helper.recurse(( File ) delegate, configs, callback ) }
@@ -61,8 +73,24 @@ class GCommons
             }
 
             LoggerFactory.getLogger( GCommons.class ).info(
-                "GCommons context initialized from [${ GCommons.classLoader.getResource( CONFIG_NAME ) }]: " +
+                "GCommons context initialized using [$logbackConfig] and [$springConfig]: " +
                 "[$context.beanDefinitionCount] beans - $context.beanDefinitionNames (${ System.currentTimeMillis() - t } ms)" )
+
+            /**
+             * Patching logback - specifying CL when initializing a GroovyShell
+             * http://jira.qos.ch/browse/LBCLASSIC-252
+             * https://github.com/ceki/logback/blob/v_0.9.28/logback-classic/src/main/groovy/ch/qos/logback/classic/gaffer/GafferConfigurator.groovy#L45
+             */
+            GafferConfigurator.metaClass.run = {
+                String dslText->
+                Binding binding  = new Binding()
+                binding.setProperty( "hostname", ContextUtil.getLocalHostName())
+                Script dslScript = new GroovyShell( MopHelper.class.classLoader, binding ).parse( dslText ) // <==== Patch
+                dslScript.metaClass.mixin(ConfigurationDelegate)
+                dslScript.context = context
+                dslScript.metaClass.getDeclaredOrigin = { dslScript }
+                dslScript.run()
+            }
         }
 
         assert context
@@ -71,7 +99,7 @@ class GCommons
         context
     }
 
-    
+
     /**
      * Retrieves bean instance for the class specified.
      *
@@ -93,7 +121,7 @@ class GCommons
             context.refresh()
             beansMap.clear()
         }
-        
+
         beansMap[ beanClass ] = beansMap.containsKey( beanClass ) ? beansMap[ beanClass ] :
                                                                     context.getBean( beanClass )
     }
