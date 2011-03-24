@@ -6,7 +6,6 @@ import ch.qos.logback.core.util.ContextUtil
 import com.goldin.gcommons.beans.BaseBean
 import groovy.io.FileType
 
-
 /**
  * MOP updates implementations.
  * http://evgeny-goldin.com/wiki/GCommons#MOP_Updates
@@ -26,13 +25,13 @@ class MopHelper extends BaseBean
             binding.setProperty( "hostname", ContextUtil.getLocalHostName())
             Script dslScript = new GroovyShell( MopHelper.class.classLoader, binding ).parse( dslText ) // <==== Patch
             dslScript.metaClass.mixin(ConfigurationDelegate)
-            dslScript.context = context
+            dslScript.setContext( context )
             dslScript.metaClass.getDeclaredOrigin = { dslScript }
             dslScript.run()
         }
     }
 
-
+    
     /**
      * Container that holds callback invocation results.
      * See {@link #invokeCallback}
@@ -57,7 +56,7 @@ class MopHelper extends BaseBean
         boolean  detectLoops
     }
 
-
+    
     /**
      * Splits object to "pieces" with an "each"-like function specified by name.
      * http://evgeny-goldin.com/wiki/GCommons#MOP_Updates
