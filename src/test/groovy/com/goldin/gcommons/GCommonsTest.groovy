@@ -15,6 +15,17 @@ class GCommonsTest extends BaseTest
         assert GCommons.context() != GCommons.context( true  )
     }
 
+
+    @Test
+    void shouldRefreshContextWithMap()
+    {
+        def contextMap = [:]
+        assert GCommons.context( false, contextMap ) == GCommons.context( false, contextMap )
+        assert GCommons.context( false, contextMap ) == GCommons.context( false, contextMap )
+        assert GCommons.context( false, contextMap ) != GCommons.context( true,  contextMap )
+    }
+
+
     @Test
     void shouldRetrieveBeans()
     {
@@ -46,6 +57,38 @@ class GCommonsTest extends BaseTest
 
 
     @Test
+    void shouldRetrieveBeansWithMap()
+    {
+        def contextMap = [:]
+
+        assert GCommons.constants()
+        assert GCommons.constants( false, contextMap )
+        assert GCommons.constants( true, contextMap )
+
+        assert GCommons.verify()
+        assert GCommons.verify( false, contextMap )
+        assert GCommons.verify( true, contextMap )
+
+        assert GCommons.general()
+        assert GCommons.general( false, contextMap )
+        assert GCommons.general( true, contextMap )
+
+        assert GCommons.file()
+        assert GCommons.file( false, contextMap )
+        assert GCommons.file( true, contextMap )
+
+        assert GCommons.io()
+        assert GCommons.io( false, contextMap )
+        assert GCommons.io( true, contextMap )
+
+        assert GCommons.net()
+        assert GCommons.net( false, contextMap )
+        assert GCommons.net( true, contextMap )
+
+    }
+
+
+    @Test
     void shouldRefresh()
     {
         assert GCommons.general() == GCommons.general()
@@ -54,10 +97,23 @@ class GCommonsTest extends BaseTest
         assert GCommons.verify() == GCommons.verify()
         assert GCommons.verify() == GCommons.verify( false )
 
-// http://evgeny-goldin.org/youtrack/issue/gc-9
-//        assert GCommons.general() != GCommons.general( true  )
-//        assert GCommons.verify()  != GCommons.verify( true  )
-//        assert GCommons.net()     != GCommons.net( true  )
+        assert GCommons.general() != GCommons.general( true  )
+        assert GCommons.verify()  != GCommons.verify( true  )
+        assert GCommons.net()     != GCommons.net( true  )
+    }
+
+
+    @Test
+    void shouldRefreshWithMap()
+    {
+        def contextMap = [:]
+
+        assert GCommons.general( false, contextMap ) == GCommons.general( false, contextMap )
+        assert GCommons.verify ( false, contextMap ) == GCommons.verify(  false, contextMap )
+
+        assert GCommons.general( false, contextMap ) != GCommons.general( true, contextMap )
+        assert GCommons.verify ( false, contextMap ) != GCommons.verify ( true, contextMap )
+        assert GCommons.net    ( false, contextMap ) != GCommons.net    ( true, contextMap )
     }
 
 
