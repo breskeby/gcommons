@@ -1,24 +1,22 @@
 package com.goldin.gcommons
 
-import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.gaffer.ConfigurationDelegate
 import ch.qos.logback.classic.gaffer.GafferConfigurator
 import ch.qos.logback.core.util.ContextUtil
-import ch.qos.logback.core.util.StatusPrinter
 import com.goldin.gcommons.util.MopHelper
 import org.slf4j.LoggerFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext
 import com.goldin.gcommons.beans.*
 
-/**
+ /**
  * "GCommons" entry points
  */
 class GCommons
 {
     private static final String CONTEXT_KEY         = GCommons.class.name + "_CONTEXT"
     private static final String BEANS_KEY           = GCommons.class.name + "_BEANS"
-    private static final String SPRING_CONFIG_NAME  = 'gcommons-application-context.xml'
+    private static final String SPRING_CONFIG_NAME  = 'spring-context.xml'
     private static final String LOGBACK_CONFIG_NAME = 'logback.groovy'
 
     private static Map<Class<? extends BaseBean>, ? extends BaseBean> BEANS_MAP
