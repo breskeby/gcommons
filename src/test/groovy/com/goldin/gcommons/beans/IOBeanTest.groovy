@@ -12,16 +12,22 @@ class IOBeanTest extends BaseTest
     void testResource()
     {
         assert   ioBean.resource( 'emptyTestResource.txt' )
+        assert   ioBean.resource( 'emptyTestResource.txt' ).openStream()
         assert   ioBean.resource( '/emptyTestResource.txt' )
-        assert ! ioBean.resource( 'emptyTestResource.txt' ).available()
+        assert   ioBean.resource( '/emptyTestResource.txt' ).openStream()
+        assert ! ioBean.resource( 'emptyTestResource.txt' ).openStream().available()
         assert   ioBean.resource( 'testResource.txt' )
-        assert   ioBean.resource( 'testResource.txt' ).available()
+        assert   ioBean.resource( 'testResource.txt' ).openStream()
+        assert   ioBean.resource( 'testResource.txt' ).openStream().available()
         assert   ioBean.resource( '/testResource.txt' )
-        assert   ioBean.resource( '/testResource.txt' ).available()
+        assert   ioBean.resource( '/testResource.txt' ).openStream()
+        assert   ioBean.resource( '/testResource.txt' ).openStream().available()
         assert   ioBean.resource( 'gradle-0.9.jar' )
-        assert   ioBean.resource( 'gradle-0.9.jar' ).available()
+        assert   ioBean.resource( 'gradle-0.9.jar' ).openStream()
+        assert   ioBean.resource( 'gradle-0.9.jar' ).openStream().available()
         assert   ioBean.resource( '/gradle-0.9.jar' )
-        assert   ioBean.resource( '/gradle-0.9.jar' ).available()
+        assert   ioBean.resource( '/gradle-0.9.jar' ).openStream()
+        assert   ioBean.resource( '/gradle-0.9.jar' ).openStream().available()
 
         shouldFailAssert { ioBean.resource( 'emptyTestResourceAAA.txt' ) }
         shouldFailAssert { ioBean.resource( 'testResourceAAA.txt' ) }
