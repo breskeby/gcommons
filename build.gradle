@@ -86,7 +86,7 @@ groovydoc {
     destinationDir = new File(( System.getProperty( 'groovydocDir' ) ?: project.buildDir.path + '/groovydoc' ),
                               ( version.contains( '-SNAPSHOT' ) ? '' : version ))
     header = '<a href="http://evgeny-goldin.com/wiki/GCommons">evgeny-goldin.com/wiki/GCommons</a>'
-    footer = '<a href="http://evgeny-goldin.com/">Evgeny Goldin</a>. GrovyDoc is generated at ' + "$time on $date." + """
+    footer = '<a href="http://evgeny-goldin.com/">Evgeny Goldin</a>. GrovyDoc was generated at ' + "$time on $date." + """
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
