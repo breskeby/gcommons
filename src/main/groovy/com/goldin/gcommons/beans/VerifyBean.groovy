@@ -192,4 +192,21 @@ class VerifyBean extends BaseBean
 
         first( collections )
     }
+
+
+    /**
+     * Verifies object is an instance of class specified.
+     *
+     * @param o object to check
+     * @param c class to check
+     * @return object checked
+     */
+    public <T> T isInstance( Object o, Class<T> c )
+    {
+        assert ( o != null ),     "Object specified is null"
+        assert ( c != null ),     "Class specified is null"
+        assert c.isInstance( o ), "Object specified is of class [${ o.getClass().name }], should be an instance of [${ c.name }]"
+
+        (( T ) o )
+    }
 }

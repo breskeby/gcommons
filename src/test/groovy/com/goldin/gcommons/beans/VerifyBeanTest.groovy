@@ -24,7 +24,7 @@ class VerifyBeanTest extends BaseTest
         shouldFailAssert { shouldFailAssert { verifyBean.notNullOrEmpty( ' c', 'bb', ' d'  ) }}
     }
 
-    
+
     @Test
     void shouldVerifyEmptyCollections()
     {
@@ -93,6 +93,7 @@ class VerifyBeanTest extends BaseTest
         verifyBean.directory( f.getParentFile().getParentFile())
     }
 
+
     @Test
     void shouldVerifyEqual()
     {
@@ -112,7 +113,7 @@ class VerifyBeanTest extends BaseTest
                 equal( dir1, dir2, true, '**/*.xml', 'linux'   )
                 equal( dir1, dir2, true, '**/*.jar' )
             }
-            
+
             fileBean.delete( fileBean.files( dir2, [ '**/*.xml' ] ) as File[] )
 
             shouldFailAssert { verifyBean.equal( dir1, dir2 )}
@@ -123,5 +124,33 @@ class VerifyBeanTest extends BaseTest
             shouldFailAssert { verifyBean.equal( dir1, dir2, true, '**/*.xml', 'linux'   )}
             shouldFailAssert { shouldFailAssert { verifyBean.equal( dir1, dir2, true, '**/*.jar' )}}
         }
+    }
+
+
+    @Test
+    void shouldVerifyIsInstance()
+    {
+        shouldFailAssert { verifyBean.isInstance( null, null   ) }
+        shouldFailAssert { verifyBean.isInstance( null, Object ) }
+        shouldFailAssert { verifyBean.isInstance( "",   null   ) }
+
+        assert "" == verifyBean.isInstance( "", String )
+        assert "" == verifyBean.isInstance( "", Serializable )
+        assert "" == verifyBean.isInstance( "", CharSequence )
+        assert "" == verifyBean.isInstance( "", Object )
+
+        shouldFailAssert { assert "" == verifyBean.isInstance( "", Map ) }
+
+        assert ['1'] == verifyBean.isInstance( ['1'], ArrayList )
+        assert ['2'] == verifyBean.isInstance( ['2'], List )
+        assert ['3'] == verifyBean.isInstance( ['3'], Object )
+
+        shouldFailAssert { assert ['3'] == verifyBean.isInstance( ['3'], String ) }
+
+        assert [1:2] == verifyBean.isInstance( [1:2], HashMap )
+        assert [3:4] == verifyBean.isInstance( [3:4], Map )
+        assert [5:6] == verifyBean.isInstance( [5:6], Object )
+
+        shouldFailAssert { assert [5:6] == verifyBean.isInstance( [5:6], Vector ) }
     }
 }

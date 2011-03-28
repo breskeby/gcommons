@@ -190,25 +190,35 @@ class NetBean extends BaseBean
          * Every time a value is read it is removed from the copy and we verify that it is empty when all values
          * are read - to prevent user errors when wrong keys are specified.
          */
-        Map<String, String> configCopy = new HashMap( config )
-        def c                          = { String key -> configCopy.remove( key ) }
-        Closure<Boolean>  readBoolean  = { Object value, boolean defaultValue -> ( value == null ) ? defaultValue : (( boolean ) value ) }
+        Map<String, String> configCopy       = new HashMap( config )
+        def                 c                = { String key                          -> configCopy.remove( key ) }
+        def                 readBoolean      = { Boolean value, boolean defaultValue -> ( value == null ) ? defaultValue :  value }
 
-        String       charset          = c( 'charset' )     ?: 'UTF-8'
-        String       contentType      = c( 'contentType' ) ?: "text/xml; charset=$charset"
-        String       path             = c( 'path' )
-        String       resource         = c( 'resource' )
-        boolean      passObject       = readBoolean( c( 'object'           ), false ) // false by default
-        boolean      passModel        = readBoolean( c( 'model'            ), false ) // false by default
-        boolean      failOnError      = readBoolean( c( 'failOnError'      ), true  ) // true  by default
-        boolean      verbose          = readBoolean( c( 'verbose'          ), true  ) // true  by default
-        boolean      checkContentType = readBoolean( c( 'checkContentType' ), true  ) // true  by default
-        ContentType  type             = JSON.contentTypeStrings.grep( contentType ) ? JSON : XML
-        String       postData         = resource ? io.resourceText( resource ) : c( 'data' ) // Allowed to be null
-        Map          extraHeaders     = ( Map         ) c( 'headers' )
-        Method       method           = ( Method      ) c( 'method'  ) ?: ( postData ? POST : GET )
-        HTTPBuilder  service          = ( HTTPBuilder ) c( 'service' )
+        String              charset          = c( 'charset' )     ?: 'UTF-8'
+        String              contentType      = c( 'contentType' ) ?: "text/xml; charset=$charset"
+        boolean             passObject       = readBoolean( c( 'object'           ), false ) // false by default
+        boolean             failOnError      = readBoolean( c( 'failOnError'      ), true  ) // true  by default
+        boolean             verbose          = readBoolean( c( 'verbose'          ), true  ) // true  by default
+        boolean             checkContentType = readBoolean( c( 'checkContentType' ), true  ) // true  by default
+        String              resource         = c( 'resource' )
+        ContentType         type             = JSON.contentTypeStrings.grep( contentType ) ? JSON : XML
+        String              postData         = resource ? io.resourceText( resource ) : c( 'data' ) // Allowed to be null
+        Map                 headers          = ( Map         ) c( 'headers' )
+        Method              method           = ( Method      ) c( 'method'  ) ?: ( postData ? POST : GET )
+        HTTPBuilder         service          = ( HTTPBuilder ) c( 'service' )
 
+        if ( ! service )
+        {
+            String host = c( 'host' )
+            int    port = ( c( 'port' ) ?: System.getProperty( 'defaultPort' ) ?: 80 ) as int
+            service     = new HTTPBuilder( "http://$host${( port == 80 ) ? '' : ':' + port }" )
+        }
+
+        verify.isInstance( service, HTTPBuilder )
+        verify.isInstance( method,  Method      )
+        verify.isInstance( type,    ContentType )
+
+        assert configCopy.isEmpty(), "Config keys left unread: ${ configCopy.keySet()}"
     }
 }
 
