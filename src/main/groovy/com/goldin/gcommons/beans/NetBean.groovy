@@ -1,18 +1,18 @@
 package com.goldin.gcommons.beans
 
-import groovyx.net.http.ContentType
-import groovyx.net.http.HTTPBuilder
-import groovyx.net.http.Method
+import groovy.util.slurpersupport.GPathResult
 import java.util.regex.Matcher
+import net.sf.json.JSONObject
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
 import org.apache.commons.net.ftp.FTPFile
 import org.apache.commons.net.ftp.FTPReply
+import org.apache.http.HttpResponse
+import groovyx.net.http.*
 import static groovyx.net.http.ContentType.JSON
 import static groovyx.net.http.ContentType.XML
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.Method.POST
-
 
 /**
  * Network-related helper methods.
@@ -191,11 +191,19 @@ class NetBean extends BaseBean
          * are read - to prevent user errors when wrong keys are specified.
          */
         Map<String, String> configCopy       = new HashMap( config )
-        def                 c                = { String key                          -> configCopy.remove( key ) }
-        def                 readBoolean      = { Boolean value, boolean defaultValue -> ( value == null ) ? defaultValue :  value }
+        def                 c                = { String key                         -> configCopy.remove( key ) }
+        def                 readBoolean      = { Object value, boolean defaultValue -> ( value == null ) ?
+                                                                                            defaultValue :
+                                                                                            verify.isInstance( value, Boolean )
+        }
+        def responseText                     = {
+            HttpResponse response -> verify.notNull( new InputStreamReader( response.entity.content,
+                                                                            ParserRegistry.getCharset( response )).text.trim())
+        }
 
         String              charset          = c( 'charset' )     ?: 'UTF-8'
         String              contentType      = c( 'contentType' ) ?: "text/xml; charset=$charset"
+        String              path             = c( 'path' )        ?: '/'
         boolean             passObject       = readBoolean( c( 'object'           ), false ) // false by default
         boolean             failOnError      = readBoolean( c( 'failOnError'      ), true  ) // true  by default
         boolean             verbose          = readBoolean( c( 'verbose'          ), true  ) // true  by default
@@ -203,7 +211,7 @@ class NetBean extends BaseBean
         String              resource         = c( 'resource' )
         ContentType         type             = JSON.contentTypeStrings.grep( contentType ) ? JSON : XML
         String              postData         = resource ? io.resourceText( resource ) : c( 'data' ) // Allowed to be null
-        Map                 headers          = ( Map         ) c( 'headers' )
+        Map                 extraHeaders     = ( Map         ) c( 'headers' )
         Method              method           = ( Method      ) c( 'method'  ) ?: ( postData ? POST : GET )
         HTTPBuilder         service          = ( HTTPBuilder ) c( 'service' )
 
@@ -219,6 +227,84 @@ class NetBean extends BaseBean
         verify.isInstance( type,    ContentType )
 
         assert configCopy.isEmpty(), "Config keys left unread: ${ configCopy.keySet()}"
+
+        /**
+         * http://groovy.codehaus.org/HTTP+Builder
+         * http://groovy.codehaus.org/modules/http-builder/
+         * http://groovy.codehaus.org/modules/http-builder/apidocs/groovyx/net/http/HTTPBuilder.RequestConfigDelegate.html
+         */
+
+        long t                  = System.currentTimeMillis()
+        service.encoderRegistry = new EncoderRegistry( charset: charset )
+        service.request( method, type ) {
+            request ->
+
+            uri.path                  = verify.notNullOrEmpty( path )
+            headers[ 'Content-Type' ] = verify.notNullOrEmpty( contentType )
+
+            if ( postData )     { send( type, postData )         }
+            if ( extraHeaders ) { headers.putAll( extraHeaders ) }
+
+            def headersString = headers.collect{ String key, String value ->  "'$key'".padRight( 20 ) + " : '$value'" }.sort()
+            def logMessage    = """
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Sending HTTP request
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Data        : [${ resource ?: postData ?: 'None' }]${ resource ? ' - [' + io.resource( resource ) + ']' : '' }
+URL         : [${ service.uri }${ path.startsWith( '/' ) ? '' : '/' }${ path }]
+Method      : [${ method }]
+Type        : [${ type }]
+Charset     : [${ charset }]
+Pass Object : [${ passObject }]
+Headers     : ${ general.stars( headersString, '', 'Headers     : '.size())}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"""
+
+            if ( verbose ) { println logMessage }
+
+
+            def responseHandler = {
+                HttpResponse response, Object responseObject ->
+
+                def statusCode = response.statusLine.statusCode
+                assert ( statusCode > 0 ), "Unknown status code [$statusCode] in response"
+                if ( checkContentType ){ assert ParserRegistry.getContentType( response ), "Missing \"Content-Type\" in response" }
+
+                if ( verbose ) { println "Done, status code [$statusCode], " +
+                                         "${ checkContentType ? 'content type [' + ParserRegistry.getContentType( response ) + '], ' : '' }" +
+                                         "[${ System.currentTimeMillis() - t }] ms" }
+
+                if ( failOnError ) { assert 200 == statusCode, "Response status code is [$statusCode]" }
+                GResponse gresponse = new GResponse( response : response )
+
+                if ( passObject )
+                {
+                    gresponse.object = verify.notNull( responseObject )
+                }
+                else
+                {
+                    assert     responseObject == null // We don't have it, see "response.success" assignment below
+                    gresponse.object = responseText( response )
+                }
+
+                callback( gresponse.validate( verbose ))
+            }
+
+            /**
+             * "HttpBuilder: is it possible to read both response object (like XML or JSON) and String response?"
+             * http://groovy.329449.n5.nabble.com/HttpBuilder-is-it-possible-to-read-both-response-object-like-XML-or-JSON-and-String-response-td3406887.html
+             */
+            response.success = ( passObject ? { HttpResponse response, Object responseObject -> responseHandler( response, responseObject ) } :
+                                              { HttpResponse response                        -> responseHandler( response, null           ) } )
+
+            response.failure = {
+                HttpResponse response ->
+
+                def statusCode = response.statusLine.statusCode
+                if ( verbose     ) { System.err.println( "Done (error!), status code [$statusCode], [${ System.currentTimeMillis() - t }] ms" )}
+                if ( failOnError ) { assert false, ( logMessage + "\nHTTP request failed and returned [$statusCode] :\n[${ responseText( response ) }]" )}
+                else               { responseHandler( response, null )}
+            }
+        }
     }
 }
 
@@ -249,4 +335,27 @@ class GFTPFile
 
     @Override
     public String toString() { "[${ this.rawListing }][${ this.path }]" }
+}
+
+
+/**
+ * Wraps {@link NetBean#http(Map, Closure)} response passed to the callback.
+ */
+class GResponse extends BaseBean
+{
+    HttpResponse response
+    Object       object
+
+    GResponse validate( boolean verbose = true )
+    {
+        assert ( response != null ), "Response is null"
+        assert ( object   != null ), "Response object is null"
+
+        if ( verbose ) { println "Response \"object\" is [${ object.getClass().name }]" }
+        this
+    }
+
+    String      getContent() { verify.isInstance( object, String      ) }
+    JSONObject  getJson()    { verify.isInstance( object, JSONObject  ) }
+    GPathResult getXml()     { verify.isInstance( object, GPathResult ) }
 }

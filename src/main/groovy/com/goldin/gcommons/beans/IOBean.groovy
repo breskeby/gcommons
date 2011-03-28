@@ -43,26 +43,24 @@ class IOBean extends BaseBean
      * Retrieves resource specified using calling class ClassLoader.
      *
      * @param resource resource path
-     * @return input stream to the resource specified
+     * @return URL of the resource specified
      */
-    InputStream resource( String resource )
+    URL resource( String resource )
     {
         assert resource
-        resource   = ( resource.startsWith( '/' ) ? resource : '/' + resource )
+        resource = ( resource.startsWith( '/' ) ? resource : '/' + resource )
         assert resource.startsWith( '/' )
 
-        def cl     = ReflectionUtils.getCallingClass( 0 )
-        def stream = cl.getResourceAsStream( resource )
+        def c   = ReflectionUtils.getCallingClass( 0 )
+        def url = c.getResource( resource )
 
-        if ( ! stream )
+        if ( ! url )
         {
-            def urls = ( cl.classLoader instanceof URLClassLoader ) ?
-                (( URLClassLoader ) cl.classLoader).URLs :
-                []
-            assert false, "Failed to load resource [$resource] using ClassLoader of class [$cl.name]:\n${ general.stars( urls as List ) }"
+            def urls = ( c.classLoader instanceof URLClassLoader ) ? (( URLClassLoader ) c.classLoader).URLs : []
+            assert false, "Failed to load resource [$resource] using ClassLoader of class [$c.name]:\n${ general.stars( urls as List ) }"
         }
 
-        stream
+        url
     }
 
 
