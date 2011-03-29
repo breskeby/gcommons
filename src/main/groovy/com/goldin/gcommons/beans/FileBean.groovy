@@ -471,8 +471,9 @@ class FileBean extends BaseBean implements InitializingBean
         assert ZIP_EXTENSIONS.contains( archiveExtension ), \
                "Extension [$archiveExtension] is not recognized as ZIP file, zip entries $zipEntries cannot be used"
 
-        def entriesWord    = ((( entries.size() == 1 ) && ( ! ( entries.toArray())[ 0 ].contains( '*' ))) ? 'entry' : 'entries' )
-        def entriesCounter = entries.any{ it.contains( '*' ) } ? '' : "[${ entries.size() }] "
+        String  entriesWord    = ((( entries.size() == 1 ) && ( ! ( entries.toArray())[ 0 ].contains( '*' ))) ? 'entry' : 'entries' )
+        String  entriesCounter = entries.any{ it.contains( '*' ) } ? '' : "[${ entries.size() }] "
+        ZipFile zipFile        = null
 
         try
         {
@@ -482,7 +483,7 @@ class FileBean extends BaseBean implements InitializingBean
             getLog( this ).info( "Unpacking [$sourceArchivePath] $entriesCounter$entriesWord $entries to [$destinationDirectoryPath]" )
 
             def time            = System.currentTimeMillis()
-            def zipFile         = new ZipFile( sourceArchive )
+            zipFile             = new ZipFile( sourceArchive )
             def matchingEntries = findMatchingEntries( zipFile.entries.toList(), entries )
             entriesCounter      = "[${ matchingEntries.size() }] "
             entriesWord         = (( matchingEntries.size() == 1 ) ? 'entry' : 'entries' )
@@ -493,12 +494,16 @@ class FileBean extends BaseBean implements InitializingBean
             getLog( this ).info( "[$sourceArchivePath] $entriesCounter$entriesWord unpacked to [$destinationDirectoryPath] " +
                                  "(${( System.currentTimeMillis() - time ).intdiv( 1000 )} sec)" )
 
-            destinationDirectory
+            return destinationDirectory
         }
         catch ( Throwable t )
         {
             throw new RuntimeException( "Failed to unpack [$sourceArchivePath] $entriesCounter$entriesWord $entries to [$destinationDirectoryPath]: $t",
                                         t )
+        }
+        finally
+        {
+            if ( zipFile ) { zipFile.close() }
         }
     }
 
@@ -563,12 +568,12 @@ class FileBean extends BaseBean implements InitializingBean
      *
      * @return whether entry was actually unpacked, <code>false</code> for directory entries ending with a "/"
      */
-    boolean unpackZipEntry( File     archive,
-                            ZipFile  zipFile = new ZipFile( archive ),
-                            ZipEntry zipEntry,
-                            File     destinationDirectory,
-                            boolean  preservePath,
-                            boolean  verbose )
+    private boolean unpackZipEntry( File     archive,
+                                    ZipFile  zipFile = new ZipFile( archive ),
+                                    ZipEntry zipEntry,
+                                    File     destinationDirectory,
+                                    boolean  preservePath,
+                                    boolean  verbose )
     {
         def entryName  = zipEntry.name
         def targetFile = new File( destinationDirectory,
