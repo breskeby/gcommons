@@ -153,11 +153,14 @@ class GeneralBean extends BaseBean
     /**
      * Executes the command specified.
      *
-     * @param command    command to execute
-     * @param timeoutMs  command's timeout in ms, 5 min by default
-     * @param stdout     OutputStream to send command's stdout to, System.out by default
-     * @param stderr     OutputStream to send command's stderr to, System.err by default
-     * @param option     strategy for executing the command, ExecOption.CommonsExec by default
+     * @param command     command to execute
+     * @param option      strategy for executing the command, ExecOption.CommonsExec by default
+     * @param stdout      OutputStream to send command's stdout to, System.out by default
+     * @param stderr      OutputStream to send command's stderr to, System.err by default
+     * @param timeoutMs   command's timeout in ms, 5 min by default.
+     *                    Returns immediately if negative or zero value is specified
+     * @param directory   process working directory
+     * @param environment environment to pass to process started
      *
      * @return           command's exit value
      */
@@ -171,6 +174,7 @@ class GeneralBean extends BaseBean
     {
         GCommons.verify().notNullOrEmpty( command )
         GCommons.verify().directory( directory )
+        def waitFor = ( timeoutMs > 0 )
 
         switch ( option )
         {
@@ -181,13 +185,15 @@ class GeneralBean extends BaseBean
 
                 executor.with {
                     streamHandler    = new PumpStreamHandler( stdout, stderr )
-                    watchdog         = new ExecuteWatchdog( timeoutMs )
                     workingDirectory = directory
+                    if ( waitFor )
+                    {
+                        watchdog     = new ExecuteWatchdog( timeoutMs )
+                    }
                 }
 
                 executor.execute( CommandLine.parse( command ), environment, handler )
-                handler.waitFor()
-
+                if ( waitFor ) { handler.waitFor() }
                 if ( handler.exception )
                 {
                     throw new RuntimeException( "Failed to invoke [$command]: ${ handler.exception }",
@@ -202,7 +208,7 @@ class GeneralBean extends BaseBean
 
                 p.consumeProcessOutputStream( stdout )
                 p.consumeProcessErrorStream( stderr )
-                p.waitForOrKill( timeoutMs )
+                if ( waitFor ) { p.waitForOrKill( timeoutMs ) }
                 return p.exitValue()
 
             case ExecOption.ProcessBuilder:
@@ -213,7 +219,7 @@ class GeneralBean extends BaseBean
                 Process p = builder.start()
                 p.consumeProcessOutputStream( stdout )
                 p.consumeProcessErrorStream( stderr )
-                p.waitForOrKill( timeoutMs )
+                if ( waitFor ) { p.waitForOrKill( timeoutMs ) }
                 return p.exitValue()
 
             default:
