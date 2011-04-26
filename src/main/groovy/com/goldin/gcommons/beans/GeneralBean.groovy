@@ -170,6 +170,7 @@ class GeneralBean extends BaseBean
                   Map          environment = new HashMap( System.getenv()))
     {
         GCommons.verify().notNullOrEmpty( command )
+        GCommons.verify().directory( directory )
 
         switch ( option )
         {
@@ -179,8 +180,8 @@ class GeneralBean extends BaseBean
                 DefaultExecuteResultHandler handler  = new DefaultExecuteResultHandler()
 
                 executor.with {
-                    streamHandler = new PumpStreamHandler( stdout, stderr )
-                    watchdog      = new ExecuteWatchdog( timeoutMs )
+                    streamHandler    = new PumpStreamHandler( stdout, stderr )
+                    watchdog         = new ExecuteWatchdog( timeoutMs )
                     workingDirectory = directory
                 }
 
