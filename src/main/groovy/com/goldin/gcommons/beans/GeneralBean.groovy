@@ -162,7 +162,7 @@ class GeneralBean extends BaseBean
      * @param directory   process working directory
      * @param environment environment to pass to process started
      *
-     * @return           command's exit value
+     * @return           command exit value or -1 if negative or zero timeout was specified
      */
     int execute ( String       command,
                   ExecOption   option      = ExecOption.CommonsExec,
@@ -174,7 +174,9 @@ class GeneralBean extends BaseBean
     {
         GCommons.verify().notNullOrEmpty( command )
         GCommons.verify().directory( directory )
-        def waitFor = ( timeoutMs > 0 )
+
+        def waitFor   = ( timeoutMs > 0 )
+        def exitValue = -1
 
         switch ( option )
         {
@@ -186,21 +188,25 @@ class GeneralBean extends BaseBean
                 executor.with {
                     streamHandler    = new PumpStreamHandler( stdout, stderr )
                     workingDirectory = directory
-                    if ( waitFor )
-                    {
+                    if ( waitFor ) {
                         watchdog     = new ExecuteWatchdog( timeoutMs )
                     }
                 }
 
                 executor.execute( CommandLine.parse( command ), environment, handler )
-                if ( waitFor ) { handler.waitFor() }
-                if ( handler.exception )
+
+                if ( waitFor )
                 {
-                    throw new RuntimeException( "Failed to invoke [$command]: ${ handler.exception }",
-                                                handler.exception )
+                    handler.waitFor()
+                    exitValue = handler.exitValue
+                    if ( handler.exception )
+                    {
+                        throw new RuntimeException( "Failed to invoke [$command]: ${ handler.exception }",
+                                                    handler.exception )
+                    }
                 }
 
-                return handler.exitValue
+                return exitValue
 
             case ExecOption.Runtime:
 
@@ -208,8 +214,14 @@ class GeneralBean extends BaseBean
 
                 p.consumeProcessOutputStream( stdout )
                 p.consumeProcessErrorStream( stderr )
-                if ( waitFor ) { p.waitForOrKill( timeoutMs ) }
-                return p.exitValue()
+
+                if ( waitFor )
+                {
+                    p.waitForOrKill( timeoutMs )
+                    exitValue = p.exitValue()
+                }
+
+                return exitValue
 
             case ExecOption.ProcessBuilder:
 
@@ -219,8 +231,14 @@ class GeneralBean extends BaseBean
                 Process p = builder.start()
                 p.consumeProcessOutputStream( stdout )
                 p.consumeProcessErrorStream( stderr )
-                if ( waitFor ) { p.waitForOrKill( timeoutMs ) }
-                return p.exitValue()
+
+                if ( waitFor )
+                {
+                    p.waitForOrKill( timeoutMs )
+                    exitValue = p.exitValue()
+                }
+
+                return exitValue
 
             default:
                 assert false : "Unknown option [$option]. Known options are ${ ExecOption.values() }"
