@@ -153,13 +153,16 @@ class GeneralBean extends BaseBean
     /**
      * Executes the command specified.
      *
-     * @param command    command to execute
-     * @param timeoutMs  command's timeout in ms, 5 min by default
-     * @param stdout     OutputStream to send command's stdout to, System.out by default
-     * @param stderr     OutputStream to send command's stderr to, System.err by default
-     * @param option     strategy for executing the command, ExecOption.CommonsExec by default
+     * @param command     command to execute
+     * @param option      strategy for executing the command, ExecOption.CommonsExec by default
+     * @param stdout      OutputStream to send command's stdout to, System.out by default
+     * @param stderr      OutputStream to send command's stderr to, System.err by default
+     * @param timeoutMs   command's timeout in ms, 5 min by default.
+     *                    Returns immediately if negative or zero value is specified
+     * @param directory   process working directory
+     * @param environment environment to pass to process started
      *
-     * @return           command's exit value
+     * @return           command exit value or -1 if negative or zero timeout was specified
      */
     int execute ( String       command,
                   ExecOption   option      = ExecOption.CommonsExec,
@@ -170,6 +173,10 @@ class GeneralBean extends BaseBean
                   Map          environment = new HashMap( System.getenv()))
     {
         GCommons.verify().notNullOrEmpty( command )
+        GCommons.verify().directory( directory )
+
+        def waitFor   = ( timeoutMs > 0 )
+        def exitValue = -1
 
         switch ( option )
         {
@@ -179,21 +186,27 @@ class GeneralBean extends BaseBean
                 DefaultExecuteResultHandler handler  = new DefaultExecuteResultHandler()
 
                 executor.with {
-                    streamHandler = new PumpStreamHandler( stdout, stderr )
-                    watchdog      = new ExecuteWatchdog( timeoutMs )
+                    streamHandler    = new PumpStreamHandler( stdout, stderr )
                     workingDirectory = directory
+                    if ( waitFor ) {
+                        watchdog     = new ExecuteWatchdog( timeoutMs )
+                    }
                 }
 
                 executor.execute( CommandLine.parse( command ), environment, handler )
-                handler.waitFor()
 
-                if ( handler.exception )
+                if ( waitFor )
                 {
-                    throw new RuntimeException( "Failed to invoke [$command]: ${ handler.exception }",
-                                                handler.exception )
+                    handler.waitFor()
+                    exitValue = handler.exitValue
+                    if ( handler.exception )
+                    {
+                        throw new RuntimeException( "Failed to invoke [$command]: ${ handler.exception }",
+                                                    handler.exception )
+                    }
                 }
 
-                return handler.exitValue
+                return exitValue
 
             case ExecOption.Runtime:
 
@@ -201,8 +214,14 @@ class GeneralBean extends BaseBean
 
                 p.consumeProcessOutputStream( stdout )
                 p.consumeProcessErrorStream( stderr )
-                p.waitForOrKill( timeoutMs )
-                return p.exitValue()
+
+                if ( waitFor )
+                {
+                    p.waitForOrKill( timeoutMs )
+                    exitValue = p.exitValue()
+                }
+
+                return exitValue
 
             case ExecOption.ProcessBuilder:
 
@@ -212,8 +231,14 @@ class GeneralBean extends BaseBean
                 Process p = builder.start()
                 p.consumeProcessOutputStream( stdout )
                 p.consumeProcessErrorStream( stderr )
-                p.waitForOrKill( timeoutMs )
-                return p.exitValue()
+
+                if ( waitFor )
+                {
+                    p.waitForOrKill( timeoutMs )
+                    exitValue = p.exitValue()
+                }
+
+                return exitValue
 
             default:
                 assert false : "Unknown option [$option]. Known options are ${ ExecOption.values() }"
