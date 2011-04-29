@@ -53,7 +53,7 @@ dependencies {
 /**
  * http://gradle.org/1.0-milestone-1/docs/dsl/org.gradle.plugins.idea.IdeaModule.html
  */
-ideaProject.javaVersion    = '1.6.0_24'
+ideaProject.javaVersion    = '1.6.0_25'
 ideaModule {
     javaVersion     = ideaProject.javaVersion
     downloadSources = true
