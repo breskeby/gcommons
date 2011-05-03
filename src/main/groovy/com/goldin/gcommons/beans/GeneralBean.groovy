@@ -158,7 +158,9 @@ class GeneralBean extends BaseBean
      * @param stdout      OutputStream to send command's stdout to, System.out by default
      * @param stderr      OutputStream to send command's stderr to, System.err by default
      * @param timeoutMs   command's timeout in ms, 5 min by default.
-     *                    Returns immediately if negative or zero value is specified
+     *                    Returns immediately if zero value is specified, blocks and waits for process
+     *                    to terminate if negative value is specified, blocks and waits amount of
+     *                    milliseconds specified if positive value is specified.
      * @param directory   process working directory
      * @param environment environment to pass to process started
      *
@@ -175,8 +177,22 @@ class GeneralBean extends BaseBean
         GCommons.verify().notNullOrEmpty( command )
         GCommons.verify().directory( directory )
 
-        def waitFor   = ( timeoutMs > 0 )
-        def exitValue = -1
+        def waitFor       = ( timeoutMs != 0 )
+        def handleProcess = { Process p ->
+
+            p.consumeProcessOutputStream( stdout )
+            p.consumeProcessErrorStream ( stderr )
+
+            def exitValue = -1
+
+            if ( waitFor )
+            {
+                ( timeoutMs < 0 ) ? p.waitFor() : p.waitForOrKill( timeoutMs )
+                exitValue = p.exitValue()
+            }
+
+            exitValue
+        }
 
         switch ( option )
         {
@@ -189,11 +205,12 @@ class GeneralBean extends BaseBean
                     streamHandler    = new PumpStreamHandler( stdout, stderr )
                     workingDirectory = directory
                     if ( waitFor ) {
-                        watchdog     = new ExecuteWatchdog( timeoutMs )
+                        watchdog     = new ExecuteWatchdog(( timeoutMs < 0 ) ? ExecuteWatchdog.INFINITE_TIMEOUT : timeoutMs )
                     }
                 }
 
                 executor.execute( CommandLine.parse( command ), environment, handler )
+                def exitValue = -1
 
                 if ( waitFor )
                 {
@@ -210,35 +227,13 @@ class GeneralBean extends BaseBean
 
             case ExecOption.Runtime:
 
-                Process p = command.execute()
-
-                p.consumeProcessOutputStream( stdout )
-                p.consumeProcessErrorStream( stderr )
-
-                if ( waitFor )
-                {
-                    p.waitForOrKill( timeoutMs )
-                    exitValue = p.exitValue()
-                }
-
-                return exitValue
+                return handleProcess( command.execute())
 
             case ExecOption.ProcessBuilder:
 
                 ProcessBuilder builder = new ProcessBuilder( command ).directory( directory )
                 builder.environment() << environment
-
-                Process p = builder.start()
-                p.consumeProcessOutputStream( stdout )
-                p.consumeProcessErrorStream( stderr )
-
-                if ( waitFor )
-                {
-                    p.waitForOrKill( timeoutMs )
-                    exitValue = p.exitValue()
-                }
-
-                return exitValue
+                return handleProcess( builder.start())
 
             default:
                 assert false : "Unknown option [$option]. Known options are ${ ExecOption.values() }"
