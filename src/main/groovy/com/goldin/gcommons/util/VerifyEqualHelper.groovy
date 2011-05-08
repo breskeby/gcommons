@@ -1,7 +1,7 @@
 package com.goldin.gcommons.util
 
 import com.goldin.gcommons.beans.BaseBean
-import static com.goldin.gcommons.GCommons.general
+import static com.goldin.gcommons.GCommons.*
 
 
 /**
@@ -43,7 +43,7 @@ class VerifyEqualHelper extends BaseBean
 
             if ( verifyChecksum )
             {
-                def ( file1Checksum,  file2Checksum ) = [ file1, file2 ].collect { file.checksum( it, 'MD5' ) }
+                def ( file1Checksum,  file2Checksum ) = [ file1, file2 ].collect { file().checksum( it, 'MD5' ) }
 
                 assert file1Checksum  == file2Checksum,  \
                        "( [$file1Path] SHA-1 checksum [$file1Checksum] ) != ( [$file2Path] SHA-1 checksum [$file2Checksum] )"
