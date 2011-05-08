@@ -13,6 +13,8 @@ import static groovyx.net.http.ContentType.JSON
 import static groovyx.net.http.ContentType.XML
 import static groovyx.net.http.Method.GET
 import static groovyx.net.http.Method.POST
+import static com.goldin.gcommons.GCommons.*
+
 
 /**
  * Network-related helper methods.
@@ -34,15 +36,15 @@ class NetBean extends BaseBean
      */
     Map<String, String> parseNetworkPath( String path )
     {
-        assert isNet( verify.notNullOrEmpty( path ))
-        Matcher matcher = ( path =~ constants.NETWORK_PATTERN )
+        assert isNet( verify().notNullOrEmpty( path ))
+        Matcher matcher = ( path =~ constants().NETWORK_PATTERN )
 
         assert ( matcher.find() && ( matcher.groupCount() == 5 )), \
                "Unable to parse [$path] as network path: it should be in format [<protocol>://<user>:<password>@<host>:<path>]. " +
-               "Regex pattern is [${ constants.NETWORK_PATTERN }]"
+               "Regex pattern is [${ constants().NETWORK_PATTERN }]"
 
         def ( String protocol, String username, String password, String host, String directory ) =
-            matcher[ 0 ][ 1 .. 5 ].collect{ verify.notNullOrEmpty( it ) }
+            matcher[ 0 ][ 1 .. 5 ].collect{ verify().notNullOrEmpty( it ) }
 
         [
             protocol  : protocol,
@@ -104,15 +106,15 @@ class NetBean extends BaseBean
      */
     public <T> T ftpClient( String remotePath, Class<T> resultType, Closure c )
     {
-        verify.notNullOrEmpty( remotePath )
-        verify.notNull( c, resultType )
+        verify().notNullOrEmpty( remotePath )
+        verify().notNull( c, resultType )
 
         FTPClient client = null
 
         try
         {
             client = ftpClient( remotePath )
-            return general.tryIt( 1, resultType ){ c( client ) }
+            return general().tryIt( 1, resultType ){ c( client ) }
         }
         finally
         {
@@ -142,13 +144,13 @@ class NetBean extends BaseBean
                               int          tries           = 10,
                               boolean      listDirectories = false )
     {
-        verify.notNullOrEmpty( remotePath )
+        verify().notNullOrEmpty( remotePath )
         assert tries > 0
 
         /**
          * Trying "tries" times to list files
          */
-        general.tryIt( tries, List,
+        general().tryIt( tries, List,
         {   /**
              * Getting a list of files for remote path
              */
@@ -160,23 +162,23 @@ class NetBean extends BaseBean
 
                 getLog( this ).info( "Listing $globPatterns${ excludes ? '/' + excludes : '' } files .." )
 
-                for ( String globPattern in globPatterns*.trim().collect{ verify.notNullOrEmpty( it ) } )
+                for ( String globPattern in globPatterns*.trim().collect{ verify().notNullOrEmpty( it ) } )
                 {
                     List<GFTPFile> gfiles = client.listFiles( globPattern ).
                                             findAll { it != null }.
                                             findAll { FTPFile  file -> (( file.name != '.' ) && ( file.name != '..' )) }.
                                             collect { FTPFile  file -> new GFTPFile( file, remotePath, globPattern ) }.
                                             findAll { GFTPFile file -> listDirectories ? true /* all entries */ : ( ! file.isDirectory()) /* files */ }.
-                                            findAll { GFTPFile file -> ( ! excludes.any{ String exclude -> general.match( file.name, exclude ) ||
+                                            findAll { GFTPFile file -> ( ! excludes.any{ String exclude -> general().match( file.name, exclude ) ||
                                                                                                            exclude.endsWith( file.name ) } ) }
 
-                    getLog( this ).info( "[$globPattern] - [${ gfiles.size() }] file${ general.s( gfiles.size() ) }" )
-                    if ( getLog( this ).isDebugEnabled()) { getLog( this ).debug( "\n" + general.stars( gfiles*.path ))}
+                    getLog( this ).info( "[$globPattern] - [${ gfiles.size() }] file${ general().s( gfiles.size() ) }" )
+                    if ( getLog( this ).isDebugEnabled()) { getLog( this ).debug( "\n" + general().stars( gfiles*.path ))}
 
                     result.addAll( gfiles )
                 }
 
-                getLog( this ).info( "[${ result.size() }] file${ general.s( result.size()) }" )
+                getLog( this ).info( "[${ result.size() }] file${ general().s( result.size()) }" )
                 result
             }
         })
@@ -194,10 +196,10 @@ class NetBean extends BaseBean
         def                 c                = { String key                         -> configCopy.remove( key ) }
         def                 readBoolean      = { Object value, boolean defaultValue -> ( value == null ) ?
                                                                                             defaultValue :
-                                                                                            verify.isInstance( value, Boolean )
+                                                                                            verify().isInstance( value, Boolean )
         }
         def responseText                     = {
-            HttpResponse response -> verify.notNull( new InputStreamReader( response.entity.content,
+            HttpResponse response -> verify().notNull( new InputStreamReader( response.entity.content,
                                                                             ParserRegistry.getCharset( response )).text.trim())
         }
 
@@ -210,7 +212,7 @@ class NetBean extends BaseBean
         boolean             checkContentType = readBoolean( c( 'checkContentType' ), true  ) // true  by default
         String              resource         = c( 'resource' )
         ContentType         type             = JSON.contentTypeStrings.grep( contentType ) ? JSON : XML
-        String              postData         = resource ? io.resourceText( resource ) : c( 'data' ) // Allowed to be null
+        String              postData         = resource ? io().resourceText( resource ) : c( 'data' ) // Allowed to be null
         Map                 extraHeaders     = ( Map         ) c( 'headers' )
         Method              method           = ( Method      ) c( 'method'  ) ?: ( postData ? POST : GET )
         HTTPBuilder         service          = ( HTTPBuilder ) c( 'service' )
@@ -222,9 +224,9 @@ class NetBean extends BaseBean
             service     = new HTTPBuilder( "http://$host${( port == 80 ) ? '' : ':' + port }" )
         }
 
-        verify.isInstance( service, HTTPBuilder )
-        verify.isInstance( method,  Method      )
-        verify.isInstance( type,    ContentType )
+        verify().isInstance( service, HTTPBuilder )
+        verify().isInstance( method,  Method      )
+        verify().isInstance( type,    ContentType )
 
         assert configCopy.isEmpty(), "Config keys left unread: ${ configCopy.keySet()}"
 
@@ -239,8 +241,8 @@ class NetBean extends BaseBean
         service.request( method, type ) {
             request ->
 
-            uri.path                  = verify.notNullOrEmpty( path )
-            headers[ 'Content-Type' ] = verify.notNullOrEmpty( contentType )
+            uri.path                  = verify().notNullOrEmpty( path )
+            headers[ 'Content-Type' ] = verify().notNullOrEmpty( contentType )
 
             if ( postData )     { send( type, postData )         }
             if ( extraHeaders ) { headers.putAll( extraHeaders ) }
@@ -250,13 +252,13 @@ class NetBean extends BaseBean
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Sending HTTP request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Data        : [${ resource ?: postData ?: 'None' }]${ resource ? ' - [' + io.resource( resource ) + ']' : '' }
+Data        : [${ resource ?: postData ?: 'None' }]${ resource ? ' - [' + io().resource( resource ) + ']' : '' }
 URL         : [${ service.uri }${ path.startsWith( '/' ) ? '' : '/' }${ path }]
 Method      : [${ method }]
 Type        : [${ type }]
 Charset     : [${ charset }]
 Pass Object : [${ passObject }]
-Headers     : ${ general.stars( headersString, '', 'Headers     : '.size())}
+Headers     : ${ general().stars( headersString, '', 'Headers     : '.size())}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"""
 
             if ( verbose ) { println logMessage }
@@ -278,7 +280,7 @@ Headers     : ${ general.stars( headersString, '', 'Headers     : '.size())}
 
                 if ( passObject )
                 {
-                    gresponse.object = verify.notNull( responseObject )
+                    gresponse.object = verify().notNull( responseObject )
                 }
                 else
                 {
@@ -355,7 +357,7 @@ class GResponse extends BaseBean
         this
     }
 
-    String      getContent() { verify.isInstance( object, String      ) }
-    JSONObject  getJson()    { verify.isInstance( object, JSONObject  ) }
-    GPathResult getXml()     { verify.isInstance( object, GPathResult ) }
+    String      getContent() { verify().isInstance( object, String      ) }
+    JSONObject  getJson()    { verify().isInstance( object, JSONObject  ) }
+    GPathResult getXml()     { verify().isInstance( object, GPathResult ) }
 }

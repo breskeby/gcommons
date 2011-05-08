@@ -3,7 +3,6 @@ package com.goldin.gcommons.beans
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
 /**
  * Base class for other beans, provides reusable functionality for all of them.
  */
@@ -13,16 +12,6 @@ class BaseBean
      * Map of loggers for each bean
      */
     private static final Map<Class<? extends BaseBean>, Logger> LOGGERS = [:]
-
-
-    /**
-     * Injected by Spring, see "spring-context.xml"
-     */
-    ConstantsBean constants
-    VerifyBean    verify
-    GeneralBean   general
-    IOBean        io
-    FileBean      file
 
 
     /**

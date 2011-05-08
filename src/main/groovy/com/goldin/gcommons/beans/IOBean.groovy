@@ -1,6 +1,8 @@
 package com.goldin.gcommons.beans
 
 import org.codehaus.groovy.reflection.ReflectionUtils
+import static com.goldin.gcommons.GCommons.*
+
 
 /**
  * I/O-related utilities
@@ -57,7 +59,7 @@ class IOBean extends BaseBean
         if ( ! url )
         {
             def urls = ( c.classLoader instanceof URLClassLoader ) ? (( URLClassLoader ) c.classLoader).URLs : []
-            assert false, "Failed to load resource [$resource] using ClassLoader of class [$c.name]:\n${ general.stars( urls as List ) }"
+            assert false, "Failed to load resource [$resource] using ClassLoader of class [$c.name]:\n${ general().stars( urls as List ) }"
         }
 
         url

@@ -2,6 +2,9 @@ package com.goldin.gcommons.beans
 
 import org.codehaus.groovy.control.CompilerConfiguration
 import com.goldin.gcommons.util.GroovyConfig
+import static com.goldin.gcommons.GCommons.*
+
+
 
 /**
  * Groovy-related helper methods.
@@ -94,7 +97,7 @@ class GroovyBean extends BaseBean
      */
     Binding binding( Map map = [:], Object ... bindingObjects )
     {
-        verify.notNull( map )
+        verify().notNull( map )
         def bindingMap = new HashMap( map )
 
         if ( bindingObjects )
@@ -120,7 +123,7 @@ class GroovyBean extends BaseBean
      */
     private Map<String, Object> fixNames( Map<String, Object> map )
     {
-        verify.notNull( map )
+        verify().notNull( map )
 
         Map<String, Object> result      = [:]
         def                 isForbidden = { ( it == '.' ) || ( it == '-' ) }

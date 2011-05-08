@@ -12,8 +12,10 @@ import org.apache.tools.ant.util.FileUtils
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipFile
 import org.springframework.beans.factory.InitializingBean
+import static com.goldin.gcommons.GCommons.*
 
- /**
+
+/**
  * File-related helper utilities.
  */
 class FileBean extends BaseBean implements InitializingBean
@@ -131,10 +133,10 @@ class FileBean extends BaseBean implements InitializingBean
      */
     String checksum ( File file, String algorithm = 'SHA-1' )
     {
-        verify.file( file )
+        verify().file( file )
 
         StringBuilder checksum = new StringBuilder()
-        MessageDigest md       = MessageDigest.getInstance( verify.notNullOrEmpty( algorithm ))
+        MessageDigest md       = MessageDigest.getInstance( verify().notNullOrEmpty( algorithm ))
         file.eachByte( 10 * 1024 ) { byte[] buffer, int n -> md.update( buffer, 0, n ) }
 
         for ( byte b in md.digest())
@@ -143,7 +145,7 @@ class FileBean extends BaseBean implements InitializingBean
             checksum.append( "${( hex.length() < 2 ) ? '0' : '' }$hex" )
         }
 
-        verify.notNullOrEmpty( checksum.toString())
+        verify().notNullOrEmpty( checksum.toString())
     }
 
 
@@ -167,7 +169,7 @@ class FileBean extends BaseBean implements InitializingBean
                        boolean      includeDirectories = false,
                        boolean      failIfNotFound     = true )
     {
-        verify.directory( baseDirectory )
+        verify().directory( baseDirectory )
 
         def scanner = new DirectoryScanner()
         def files   = []
@@ -185,7 +187,7 @@ class FileBean extends BaseBean implements InitializingBean
 
         for ( String filePath in scanner.includedFiles )
         {
-            files << verify.file( new File( baseDirectory, filePath ))
+            files << verify().file( new File( baseDirectory, filePath ))
         }
 
         if ( includeDirectories )
@@ -194,7 +196,7 @@ class FileBean extends BaseBean implements InitializingBean
             {
                 if ( directoryPath )
                 {
-                    files << verify.directory( new File ( baseDirectory, directoryPath ))
+                    files << verify().directory( new File ( baseDirectory, directoryPath ))
                 }
             }
         }
@@ -217,7 +219,7 @@ class FileBean extends BaseBean implements InitializingBean
     @SuppressWarnings( "GroovyMultipleReturnPointsPerMethod" )
     private String tarCompression( String archiveExtension )
     {
-        switch ( verify.notNullOrEmpty( archiveExtension ))
+        switch ( verify().notNullOrEmpty( archiveExtension ))
         {
             case 'tar'     : return 'none'
 
@@ -243,15 +245,15 @@ class FileBean extends BaseBean implements InitializingBean
      */
     File copy ( File file, File directory, String newName = file.name )
     {
-        verify.file( file )
-        verify.notNull( directory )
+        verify().file( file )
+        verify().notNull( directory )
 
         File destinationFile = new File( directory, newName )
         if ( destinationFile.exists()) { delete( destinationFile )}
 
         FileUtils.newFileUtils().copyFile( file, destinationFile )
 
-        verify.file( destinationFile )
+        verify().file( destinationFile )
         assert file.size() == destinationFile.size()
 
         destinationFile
@@ -299,8 +301,8 @@ class FileBean extends BaseBean implements InitializingBean
                 boolean      failIfNotFound = true,
                 boolean      update         = false )
     {
-        verify.directory( sourceDirectory )
-        verify.notNull( destinationArchive )
+        verify().directory( sourceDirectory )
+        verify().notNull( destinationArchive )
 
         String sourceDirectoryPath    = sourceDirectory.canonicalPath
         String destinationArchivePath = destinationArchive.canonicalPath
@@ -317,7 +319,7 @@ class FileBean extends BaseBean implements InitializingBean
             if ( update )
             {
                 assert isZip, "Archive update is only supported for Zip archives: $ZIP_EXTENSIONS, not supported for [$destinationArchivePath]"
-                verify.file( destinationArchive )
+                verify().file( destinationArchive )
             }
             else
             {
@@ -355,7 +357,7 @@ class FileBean extends BaseBean implements InitializingBean
                  */
                 for ( File file in files( sourceDirectory, includes, excludes, caseSensitive, false, failIfNotFound ))
                 {
-                    def relativePath = verify.notNullOrEmpty( file.canonicalPath.substring( sourceDirectoryPath.length()))
+                    def relativePath = verify().notNullOrEmpty( file.canonicalPath.substring( sourceDirectoryPath.length()))
                     de.schlichtherle.io.File.cp_p( file, new de.schlichtherle.io.File( destinationArchive, relativePath ))
                 }
 
@@ -365,7 +367,7 @@ class FileBean extends BaseBean implements InitializingBean
             getLog( this ).info( "[$sourceDirectory$patterns] packed to [$destinationArchivePath] " +
                                  "(${( System.currentTimeMillis() - time ).intdiv( 1000 )} sec)" )
 
-            verify.notEmptyFile( destinationArchive )
+            verify().notEmptyFile( destinationArchive )
         }
         catch ( Throwable t )
         {
@@ -387,8 +389,8 @@ class FileBean extends BaseBean implements InitializingBean
     File unpack ( File sourceArchive,
                   File destinationDirectory )
     {
-        verify.notEmptyFile( sourceArchive )
-        verify.notNull( destinationDirectory )
+        verify().notEmptyFile( sourceArchive )
+        verify().notNull( destinationDirectory )
 
         def sourceArchivePath        = sourceArchive.canonicalPath
         def destinationDirectoryPath = destinationDirectory.canonicalPath
@@ -429,7 +431,7 @@ class FileBean extends BaseBean implements InitializingBean
                 de.schlichtherle.io.File.umount()
             }
 
-            verify.directory( destinationDirectory )
+            verify().directory( destinationDirectory )
             getLog( this ).info( "[$sourceArchivePath] unpacked to [$destinationDirectoryPath] " +
                                  "(${( System.currentTimeMillis() - time ).intdiv( 1000 )} sec)" )
 
@@ -457,8 +459,8 @@ class FileBean extends BaseBean implements InitializingBean
                             boolean      preservePath = false,
                             boolean      verbose      = true )
     {
-        verify.notEmptyFile( sourceArchive )
-        verify.notNull( destinationDirectory )
+        verify().notEmptyFile( sourceArchive )
+        verify().notNull( destinationDirectory )
 
         def sourceArchivePath        = sourceArchive.canonicalPath
         def destinationDirectoryPath = destinationDirectory.canonicalPath
@@ -490,7 +492,7 @@ class FileBean extends BaseBean implements InitializingBean
 
             matchingEntries.each{ unpackZipEntry( sourceArchive, zipFile, it, destinationDirectory, preservePath, verbose )}
 
-            verify.directory( destinationDirectory )
+            verify().directory( destinationDirectory )
             getLog( this ).info( "[$sourceArchivePath] $entriesCounter$entriesWord unpacked to [$destinationDirectoryPath] " +
                                  "(${( System.currentTimeMillis() - time ).intdiv( 1000 )} sec)" )
 
@@ -535,7 +537,7 @@ class FileBean extends BaseBean implements InitializingBean
 
             assert ( zipEntry && ( nonPatternedEntries || patternedEntries ))
             nonPatternedEntries.any{ zipEntry.name == it } ||
-            patternedEntries.any   { general.match( zipEntry.name, it ) }
+            patternedEntries.any   { general().match( zipEntry.name, it ) }
         }
 
         List<ZipEntry> matchingEntries = zipEntries.findAll{ entryMatch( it, nonPatternedUserEntries, patternedUserEntries ) }
@@ -552,7 +554,7 @@ class FileBean extends BaseBean implements InitializingBean
                    "Failed to match [$userEntry] pattern in Zip entries $zipEntries"
         }
 
-        verify.notNullOrEmpty( matchingEntries )
+        verify().notNullOrEmpty( matchingEntries )
     }
 
 
@@ -615,7 +617,7 @@ class FileBean extends BaseBean implements InitializingBean
             }
         }
 
-        verify.file( targetFile )
+        verify().file( targetFile )
         assert ( bytesWritten == zipEntry.size ) && ( targetFile.size() == zipEntry.size ), \
                "Zip entry [$entryName]: size is [$zipEntry.size], [$bytesWritten] bytes written, " +
                "[${ targetFile.size() }] file size of [$targetFile.canonicalPath]"
@@ -623,7 +625,7 @@ class FileBean extends BaseBean implements InitializingBean
         if ( verbose )
         {
             getLog( this ).info( "[$archive.canonicalPath]/[$entryName] is written to [$targetFile.canonicalPath], " +
-                                 "[$bytesWritten] byte${ general.s( bytesWritten ) }" )
+                                 "[$bytesWritten] byte${ general().s( bytesWritten ) }" )
         }
 
         true

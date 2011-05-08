@@ -57,9 +57,13 @@ class GCommons
 
             java.util.logging.Logger.getLogger( 'org.springframework' ).level = java.util.logging.Level.WARNING
 
-            long t                       = System.currentTimeMillis()
-            context                      = new ClassPathXmlApplicationContext( SPRING_CONFIG_NAME )
-            MopHelper helper             = context.getBean( MopHelper.class )
+            long t           = System.currentTimeMillis()
+            context          = new ClassPathXmlApplicationContext( SPRING_CONFIG_NAME )
+            MopHelper helper = context.getBean( MopHelper.class )
+
+            LoggerFactory.getLogger( GCommons.class ).debug(
+                "GCommons context initialized using ${ logbackConfig ? '[' + logbackConfig + '] and ' : '' }[$springConfig]: " +
+                "[$context.beanDefinitionCount] beans - $context.beanDefinitionNames (${ System.currentTimeMillis() - t } ms)" )
 
             Object.metaClass.splitWith   = { Object[] args                       -> helper.splitWith( delegate, args ) }
             File.metaClass.recurse       = { Map configs = [:], Closure callback -> helper.recurse(( File ) delegate, configs, callback ) }
@@ -75,10 +79,6 @@ class GCommons
                 contextMap[ CONTEXT_KEY ] = context
                 contextMap[ BEANS_KEY   ] = [:]
             }
-
-            LoggerFactory.getLogger( GCommons.class ).info(
-                "GCommons context initialized using ${ logbackConfig ? '[' + logbackConfig + '] and ' : '' }[$springConfig]: " +
-                "[$context.beanDefinitionCount] beans - $context.beanDefinitionNames (${ System.currentTimeMillis() - t } ms)" )
         }
 
         assert context

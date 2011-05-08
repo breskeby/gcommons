@@ -4,6 +4,8 @@ import com.goldin.gcommons.GCommons
 import java.lang.reflect.Array
 import org.springframework.util.AntPathMatcher
 import org.apache.commons.exec.*
+import static com.goldin.gcommons.GCommons.*
+
 
 /**
  * General usage methods
@@ -21,7 +23,7 @@ class GeneralBean extends BaseBean
      */
     boolean match ( String path, String pattern )
     {
-        verify.notNullOrEmpty( path, pattern )
+        verify().notNullOrEmpty( path, pattern )
 
         ( path, pattern ) = [ path, pattern ]*.replaceAll( /\\+/, AntPathMatcher.DEFAULT_PATH_SEPARATOR )
 
@@ -60,7 +62,7 @@ class GeneralBean extends BaseBean
     public <T> T tryIt( int nTries, Class<T> resultType, Closure c )
     {
         assert ( nTries > 0 )
-        verify.notNull( c )
+        verify().notNull( c )
 
         def tries = 0
 
@@ -252,7 +254,7 @@ class GeneralBean extends BaseBean
      * @return         multi-line <code>Collection</code> representation where each element is prepended with a prefix,
      *                 empty <code>String</code> if collection is empty
      */
-    String stars ( Collection c, String prefix = '* ', int padSize = 0, String crlf = constants.CRLF )
+    String stars ( Collection c, String prefix = '* ', int padSize = 0, String crlf = constants().CRLF )
     {
         ( c ? "$prefix[${ c.join( "]$crlf${ ' ' * padSize }$prefix[") }]" : '' )
     }

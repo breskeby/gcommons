@@ -1,19 +1,14 @@
 package com.goldin.gcommons.util
 
 import com.goldin.gcommons.beans.BaseBean
-import com.goldin.gcommons.beans.FileBean
+import static com.goldin.gcommons.GCommons.general
+
 
 /**
  * {@link com.goldin.gcommons.beans.VerifyBean#equal(File, File, boolean, String)} helper class
  */
 class VerifyEqualHelper extends BaseBean
 {
-    /**
-     * Set by Spring
-     */
-    FileBean file
-
-
     /**
      * Verifies two files specified are equal, considering the pattern and returns 1 or 0
      * 1 if files matched the pattern
@@ -31,7 +26,7 @@ class VerifyEqualHelper extends BaseBean
         def file1Path = file1.canonicalPath
         def file2Path = file2.canonicalPath
 
-        if (( ! pattern ) || ( [ file1Path, file2Path ].every{ general.match( it, pattern ) } ))
+        if (( ! pattern ) || ( [ file1Path, file2Path ].every{ general().match( it, pattern ) } ))
         {
             if ( endOfLine )
             {
@@ -125,7 +120,7 @@ class VerifyEqualHelper extends BaseBean
                     }
                     else
                     {
-                        if ( dir2File.isFile() && (( ! pattern ) || general.match( dir2File.canonicalPath, pattern )))
+                        if ( dir2File.isFile() && (( ! pattern ) || general().match( dir2File.canonicalPath, pattern )))
                         {
                             assert false, "There's no file [$dir1FilePath] corresponding to file [$dir2FilePath]"
                         }
@@ -160,11 +155,11 @@ class VerifyEqualHelper extends BaseBean
 
         if ( file1.isFile())
         {
-            if (( ! pattern ) || general.match( file1Path, pattern ))
+            if (( ! pattern ) || general().match( file1Path, pattern ))
             {
                 if ( file2.isFile())
                 {
-                    assert (( ! pattern ) || general.match( file2Path, pattern )), \
+                    assert (( ! pattern ) || general().match( file2Path, pattern )), \
                            "[$file2Path] doesn't match pattern [$pattern] while [$file1Path] does"
 
                     return verifyEqualFiles ( file1, file2, pattern, verifyChecksum, endOfLine, false )

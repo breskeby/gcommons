@@ -5,6 +5,8 @@ import ch.qos.logback.classic.gaffer.GafferConfigurator
 import ch.qos.logback.core.util.ContextUtil
 import com.goldin.gcommons.beans.BaseBean
 import groovy.io.FileType
+import static com.goldin.gcommons.GCommons.*
+
 
 /**
  * MOP updates implementations.
@@ -31,7 +33,7 @@ class MopHelper extends BaseBean
         }
     }
 
-    
+
     /**
      * Container that holds callback invocation results.
      * See {@link #invokeCallback}
@@ -56,7 +58,7 @@ class MopHelper extends BaseBean
         boolean  detectLoops
     }
 
-    
+
     /**
      * Splits object to "pieces" with an "each"-like function specified by name.
      * http://evgeny-goldin.com/wiki/GCommons#MOP_Updates
@@ -147,11 +149,11 @@ class MopHelper extends BaseBean
 
         def config          = new RecurseConfig()
         config.filter       = ( Closure ) configs[ 'filter' ] // Allowed to be null
-        config.fileType     = general.choose(( FileType ) configs[ 'type'         ], FileType.ANY    )
-        config.filterType   = general.choose(( FileType ) configs[ 'filterType'   ], config.fileType )
-        config.stopOnFalse  = general.choose(( boolean )  configs[ 'stopOnFalse'  ], false           )
-        config.stopOnFilter = general.choose(( boolean )  configs[ 'stopOnFilter' ], false           )
-        config.detectLoops  = general.choose(( boolean )  configs[ 'detectLoops'  ], false           )
+        config.fileType     = general().choose(( FileType ) configs[ 'type'         ], FileType.ANY    )
+        config.filterType   = general().choose(( FileType ) configs[ 'filterType'   ], config.fileType )
+        config.stopOnFalse  = general().choose(( boolean )  configs[ 'stopOnFalse'  ], false           )
+        config.stopOnFilter = general().choose(( boolean )  configs[ 'stopOnFilter' ], false           )
+        config.detectLoops  = general().choose(( boolean )  configs[ 'detectLoops'  ], false           )
 
         handleDirectory(( File ) delegate, callback, config, ( config.detectLoops ? [] as Set : null ))
     }
@@ -190,8 +192,8 @@ class MopHelper extends BaseBean
                                   RecurseConfig config,
                                   Set<String>   directories )
     {
-        verify.directory( directory )
-        verify.notNull( callback, config )
+        verify().directory( directory )
+        verify().notNull( callback, config )
 
         if ( config.detectLoops && ( ! directories.add( directory.canonicalPath )))
         {
@@ -228,11 +230,11 @@ class MopHelper extends BaseBean
                                               Closure<?>    callback,
                                               RecurseConfig config )
     {
-        verify.exists( callbackFile )
-        verify.notNull( callback, config )
+        verify().exists( callbackFile )
+        verify().notNull( callback, config )
 
-        def fileTypeMatch       = file.typeMatch( config.fileType,   callbackFile )
-        def filterTypeMatch     = file.typeMatch( config.filterType, callbackFile )
+        def fileTypeMatch       = file().typeMatch( config.fileType,   callbackFile )
+        def filterTypeMatch     = file().typeMatch( config.filterType, callbackFile )
         def result              = new InvocationResult()
         result.filterPass       = (( config.filter == null ) || ( ! filterTypeMatch ) || config.filter( callbackFile ))
         result.invocationResult = true
@@ -240,7 +242,7 @@ class MopHelper extends BaseBean
         if ( fileTypeMatch && result.filterPass )
         {
             Object callbackResult   = callback( callbackFile )
-            result.invocationResult = general.choose( callbackResult as boolean, true )
+            result.invocationResult = general().choose( callbackResult as boolean, true )
         }
 
         result

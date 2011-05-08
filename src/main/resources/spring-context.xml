@@ -7,69 +7,43 @@
 
 
     <bean name                    = "constants"
-          class                   = "com.goldin.gcommons.beans.ConstantsBean"/>
+          class                   = "com.goldin.gcommons.beans.ConstantsBean"
+          lazy-init               = "true"/>
 
     <bean name                    = "verify"
           class                   = "com.goldin.gcommons.beans.VerifyBean"
-          p:constants-ref         = "constants"
-          p:verifyEqualHelper-ref = "verifyEqualHelper"/>
+          p:verifyEqualHelper-ref = "verifyEqualHelper"
+          lazy-init               = "true"/>
 
     <bean name                    = "general"
           class                   = "com.goldin.gcommons.beans.GeneralBean"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"/>
+          lazy-init               = "true"/>
 
     <bean name                    = "io"
           class                   = "com.goldin.gcommons.beans.IOBean"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
-          p:file-ref              = "file"/>
+          lazy-init               = "true"/>
 
     <bean name                    = "file"
           class                   = "com.goldin.gcommons.beans.FileBean"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
-          p:io-ref                = "io"/>
+          lazy-init               = "true"/>
 
     <bean name                    = "mopHelper"
           class                   = "com.goldin.gcommons.util.MopHelper"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
-          p:io-ref                = "io"
-          p:file-ref              = "file"/>
+          lazy-init               = "true"/>
 
     <bean name                    = "verifyEqualHelper"
           class                   = "com.goldin.gcommons.util.VerifyEqualHelper"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
-          p:io-ref                = "io"
-          p:file-ref              = "file"/>
+          lazy-init               = "true"/>
 
     <bean name                    = "net"
           class                   = "com.goldin.gcommons.beans.NetBean"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
-          p:io-ref                = "io"
-          p:file-ref              = "file"/>
+          lazy-init               = "true"/>
 
     <bean name                    = "groovy"
           class                   = "com.goldin.gcommons.beans.GroovyBean"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
-          p:io-ref                = "io"
-          p:file-ref              = "file"/>
+          lazy-init               = "true"/>
 
     <bean name                    = "algorithms"
           class                   = "com.goldin.gcommons.beans.AlgorithmsBean"
-          p:constants-ref         = "constants"
-          p:verify-ref            = "verify"
-          p:general-ref           = "general"
-          p:io-ref                = "io"
-          p:file-ref              = "file"/>
+          lazy-init               = "true"/>
 </beans>
