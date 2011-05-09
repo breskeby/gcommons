@@ -589,14 +589,9 @@ class FileBean extends BaseBean implements InitializingBean
         if ( entryName.endsWith( '/' ))
         {   // Directory entry
             assert zipEntry.size == 0, "Zip entry [$entryName] ends with '/' but it's size is not zero [$zipEntry.size]"
-            if ( targetFile.isDirectory())
-            {
-                if ( verbose ) { getLog( this ).info( "[$archive.canonicalPath]/[$entryName] is a directory that already exists, doing nothing" )}
-            }
-            else
+            if ( ! targetFile.isDirectory())
             {
                 mkdirs( targetFile )
-                if ( verbose ) { getLog( this ).info( "[$archive.canonicalPath]/[$entryName] is a directory, [$targetFile.canonicalPath] is created" )}
             }
 
             return false
@@ -626,12 +621,6 @@ class FileBean extends BaseBean implements InitializingBean
         assert ( bytesWritten == zipEntry.size ) && ( targetFile.size() == zipEntry.size ), \
                "Zip entry [$entryName]: size is [$zipEntry.size], [$bytesWritten] bytes written, " +
                "[${ targetFile.size() }] file size of [$targetFile.canonicalPath]"
-
-        if ( verbose )
-        {
-            getLog( this ).info( "[$archive.canonicalPath]/[$entryName] is written to [$targetFile.canonicalPath], " +
-                                 "[$bytesWritten] byte${ general().s( bytesWritten ) }" )
-        }
 
         true
     }
