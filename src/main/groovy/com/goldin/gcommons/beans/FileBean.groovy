@@ -290,16 +290,18 @@ class FileBean extends BaseBean implements InitializingBean
      * @param failIfNotFound     whether execution should fail if no files were found
      * @param update             whether target archive should be updated if already exists,
      *                           only works for ZIP files (jar, ear, war, hpi, etc)
+     * @param defaultExcludes    list of default exclude patterns that won't be displayed in log
      *
      * @return archive packed
      */
     File pack ( File         sourceDirectory,
                 File         destinationArchive,
-                List<String> includes       = null,
-                List<String> excludes       = null,
-                boolean      caseSensitive  = true,
-                boolean      failIfNotFound = true,
-                boolean      update         = false )
+                List<String> includes        = null,
+                List<String> excludes        = null,
+                boolean      caseSensitive   = true,
+                boolean      failIfNotFound  = true,
+                boolean      update          = false,
+                List<String> defaultExcludes = null )
     {
         verify().directory( sourceDirectory )
         verify().notNull( destinationArchive )
@@ -310,8 +312,11 @@ class FileBean extends BaseBean implements InitializingBean
         try
         {
             def time             = System.currentTimeMillis()
-            def patterns         = "${ includes ?: '' }/${ excludes ?: '' }"
-            patterns             = (( patterns == '/' ) ? '' : " ($patterns)" )
+            def excludesDisplay  = (( excludes ?: [] ) - defaultExcludes )
+            def patterns         = "${ includes ?: '' }/${ excludesDisplay ?: '' }"
+            patterns             = (( patterns == '/'         ) ? ''             :
+                                    ( patterns.endsWith( '/' )) ? " ($includes)" :
+                                                                  " ($patterns)" )
             def archiveExtension = extension( destinationArchive )
             def isZip            = ZIP_EXTENSIONS.contains( archiveExtension )
             def izTar            = TAR_EXTENSIONS.contains( archiveExtension )
