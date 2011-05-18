@@ -21,7 +21,8 @@ httpBuilderVersion  = '0.5.1'
 
 //  Gradle Plugins
 buildscript {
-    repositories { mavenRepo urls: uri ( 'c:/Users/Evgeny/.m2/repository' ) } //'http://evgeny-goldin.org/artifactory/repo/' }
+    repositories { mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/' }
+//    repositories { mavenRepo urls: uri ( 'c:/Users/Evgeny/.m2/repository' ) } //'http://evgeny-goldin.org/artifactory/repo/' }
     dependencies { classpath 'com.goldin.plugins:gradle:0.0.1-SNAPSHOT' }
 }
 
