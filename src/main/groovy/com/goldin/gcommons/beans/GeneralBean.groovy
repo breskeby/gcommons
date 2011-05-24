@@ -179,67 +179,61 @@ class GeneralBean extends BaseBean
         GCommons.verify().notNullOrEmpty( command )
         GCommons.verify().directory( directory )
 
-        def waitFor       = ( timeoutMs != 0 )
-        def handleProcess = { Process p ->
-
-            p.consumeProcessOutputStream( stdout )
-            p.consumeProcessErrorStream ( stderr )
-
-            def exitValue = -1
-
-            if ( waitFor )
-            {
-                ( timeoutMs < 0 ) ? p.waitFor() : p.waitForOrKill( timeoutMs )
-                exitValue = p.exitValue()
-            }
-
-            exitValue
-        }
-
         switch ( option )
         {
             case ExecOption.CommonsExec:
 
-                Executor                    executor = new DefaultExecutor()
-                DefaultExecuteResultHandler handler  = new DefaultExecuteResultHandler()
-
+                Executor executor = new DefaultExecutor()
                 executor.with {
                     streamHandler    = new PumpStreamHandler( stdout, stderr )
                     workingDirectory = directory
-                    if ( waitFor ) {
-                        watchdog     = new ExecuteWatchdog(( timeoutMs < 0 ) ? ExecuteWatchdog.INFINITE_TIMEOUT : timeoutMs )
-                    }
+                    watchdog         = ( timeoutMs == 0 ) ? null :
+                                       ( timeoutMs  < 0 ) ? new ExecuteWatchdog( ExecuteWatchdog.INFINITE_TIMEOUT ) :
+                                                            new ExecuteWatchdog( timeoutMs )
                 }
 
-                executor.execute( CommandLine.parse( command ), environment, handler )
-                def exitValue = -1
-
-                if ( waitFor )
-                {
-                    handler.waitFor()
-                    exitValue = handler.exitValue
-                    if ( handler.exception )
-                    {
-                        throw new RuntimeException( "Failed to invoke [$command]: ${ handler.exception }",
-                                                    handler.exception )
-                    }
-                }
-
-                return exitValue
+                return executor.execute( CommandLine.parse( command ), environment )
 
             case ExecOption.Runtime:
 
-                return handleProcess( command.execute())
+                return handleProcess( command.execute(), stdout, stderr, timeoutMs )
 
             case ExecOption.ProcessBuilder:
 
                 ProcessBuilder builder = new ProcessBuilder( command ).directory( directory )
                 builder.environment() << environment
-                return handleProcess( builder.start())
+                return handleProcess( builder.start(), stdout, stderr, timeoutMs )
 
             default:
                 assert false : "Unknown option [$option]. Known options are ${ ExecOption.values() }"
         }
+    }
+
+
+    /**
+     * Handles the process specified.
+     *
+     * @param p         process to handle
+     * @param stdout    standard output to send process output stream
+     * @param stderr    error output to send process error stream
+     * @param timeoutMs process execution timeout in milliseconds,
+     *                  execution is asynchronous if timeout is zero
+     * @return          process exit code
+     */
+    private int handleProcess( Process p, OutputStream stdout, OutputStream stderr, long timeoutMs )
+    {
+        p.consumeProcessOutputStream( stdout )
+        p.consumeProcessErrorStream ( stderr )
+
+        int exitValue = -1
+
+        if ( timeoutMs != 0 )
+        {
+            ( timeoutMs < 0 ) ? p.waitFor() : p.waitForOrKill( timeoutMs )
+            exitValue = p.exitValue()
+        }
+
+        exitValue
     }
 
 
