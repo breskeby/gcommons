@@ -29,7 +29,12 @@ buildscript {
 repositories { mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/' }
 
 
-about { dumpDependencies = true }
+/**
+ * Adding "about" data to Jar created
+ * https://github.com/evgeny-goldin/gradle-plugins
+ */
+about  { dumpDependencies = true }
+jar << { about.execute() }
 
 
 dependencies {
@@ -58,45 +63,31 @@ dependencies {
 }
 
 
-/**
- * http://gradle.org/1.0-milestone-1/docs/dsl/org.gradle.plugins.idea.IdeaModule.html
- */
-ideaProject.javaVersion    = '1.6.0_25'
+ideaProject {
+    javaVersion     = '1.6.0_25'
+}
 ideaModule {
-    javaVersion     = ideaProject.javaVersion
     downloadSources = true
-    downloadJavadoc = false
-    outputDir       = new File( project.buildDir, 'idea' )
-    testOutputDir   = new File( project.buildDir, 'idea/test' )
+    downloadJavadoc = true
 }
 
 
-/**
- * http://gradle.org/1.0-milestone-1/docs/dsl/org.gradle.api.tasks.testing.Test.html
- * http://gradle.org/1.0-milestone-1/docs/javadoc/org/gradle/api/tasks/testing/Test.html
- */
 test {
-    test.testReportDir    = new File(( File ) project.buildDir, 'test/reports' )
-    test.testResultsDir   = new File(( File ) project.buildDir, 'test/results' )
-    test.systemProperties = System.properties.containsKey( 'slowTests' ) ? [ slowTests : 'true' ] : [:]
-    test.setDebug( System.properties.containsKey( 'debug' ))
+    testReportDir    = new File(( File ) project.buildDir, 'test/reports' )
+    testResultsDir   = new File(( File ) project.buildDir, 'test/results' )
+    systemProperties = System.properties.containsKey( 'slowTests' ) ? [ slowTests : 'true' ] : [:]
+    debug            = System.properties.containsKey( 'debug' )
 }
 
 
 /**
- * Adding "about" data to Jar created
- */
-jar << { about.execute() }
-
-
-/**
- * http://gradle.org/1.0-milestone-1/docs/dsl/org.gradle.api.tasks.javadoc.Groovydoc.html
+ * http://gradle.org/current/docs/dsl/org.gradle.api.tasks.javadoc.Groovydoc.html
  */
 def d    = new Date()
 def time = new SimpleDateFormat( "HH:mm '(GMT'Z')'" ).format( d )
 def date = new SimpleDateFormat( 'MMMM dd, yyyy' ).format( d )
-groovydoc.setUse( true )
 groovydoc {
+    use            = true
     destinationDir = new File(( System.getProperty( 'groovydocDir' ) ?: project.buildDir.path + '/groovydoc' ),
                               ( version.contains( '-SNAPSHOT' ) ? '' : version ))
     header = '<a href="http://evgeny-goldin.com/wiki/GCommons">evgeny-goldin.com/wiki/GCommons</a>'
