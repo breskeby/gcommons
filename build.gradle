@@ -19,14 +19,13 @@ junitVersion        = '4.8.2'
 truezipVersion      = '6.8.2'
 httpBuilderVersion  = '0.5.1'
 
-//  Gradle Plugins
+
 buildscript {
     repositories { mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/' }
-//    repositories { mavenRepo urls: uri ( 'c:/Users/Evgeny/.m2/repository' ) } //'http://evgeny-goldin.org/artifactory/repo/' }
+//    repositories { mavenRepo urls: uri ( "${ System.getProperty( 'user.home' )}/.m2/repository" ) }
     dependencies { classpath 'com.goldin.plugins:gradle:0.0.1-SNAPSHOT' }
 }
 
-// Regular dependencies
 repositories { mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/' }
 
 
@@ -82,6 +81,12 @@ test {
     test.systemProperties = System.properties.containsKey( 'slowTests' ) ? [ slowTests : 'true' ] : [:]
     test.setDebug( System.properties.containsKey( 'debug' ))
 }
+
+
+/**
+ * Adding "about" data to Jar created
+ */
+jar << { about.execute() }
 
 
 /**
