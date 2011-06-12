@@ -174,8 +174,6 @@ class FileBean extends BaseBean implements InitializingBean
         def scanner = new DirectoryScanner()
         def files   = []
 
-
-        scanner.basedir           = baseDirectory
         scanner.basedir           = baseDirectory
         scanner.includes          = includes as String[]
         scanner.excludes          = excludes as String[]

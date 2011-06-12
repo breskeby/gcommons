@@ -23,18 +23,19 @@ httpBuilderVersion  = '0.5.1'
 buildscript {
     repositories { mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/' }
 //    repositories { mavenRepo urls: uri ( "${ System.getProperty( 'user.home' )}/.m2/repository" ) }
-    dependencies { classpath 'com.goldin.plugins:gradle:0.0.1-SNAPSHOT' }
+    dependencies { classpath 'com.goldin.plugins:gradle:0.1-RC' }
 }
 
 repositories { mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/' }
 
 
 /**
- * Adding "about" data to Jar created
- * https://github.com/evgeny-goldin/gradle-plugins
+ * Adding "about" data to all jars created
+ * http://evgeny-goldin.com/wiki/Gradle-about-plugin
  */
-about  { dumpDependencies = true }
-jar << { about.execute() }
+about { dumpDependencies = true   }
+assemble.doLast { about.execute() }
+install.doFirst { about.execute() }
 
 
 dependencies {
@@ -131,7 +132,7 @@ groovydoc {
  * http://gradle.1045684.n5.nabble.com/javadoc-and-source-jars-td3246213.html
  */
 task sourcesJar( type: Jar, dependsOn: classes ) {
-     classifier = 'sources'
-     from sourceSets.main.allSource
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 artifacts { archives sourcesJar }
